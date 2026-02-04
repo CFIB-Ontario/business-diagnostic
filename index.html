@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Business Friction Diagnostic</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 30px;
+            max-width: 800px;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 20px;
+            width: 100%;
+            max-width: 900px;
+        }
+        .box {
+            padding: 30px 20px;
+            border-radius: 12px;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 180px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .red { background-color: #e33e33; }
+        .orange { background-color: #f39200; }
+        .green { background-color: #4caf50; grid-column: span 2; }
+        
+        .box h2 { font-size: 26px; margin: 0 0 10px 0; pointer-events: none; }
+        .box p { font-size: 16px; margin: 0; opacity: 0.9; pointer-events: none; }
+        
+        .box.selected {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 6px #004a99;
+            z-index: 10;
+        }
+        .box.dimmed {
+            opacity: 0.2;
+            filter: grayscale(80%);
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #004a99;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .details-container {
+            width: 100%;
+            max-width: 900px;
+            margin-top: 40px;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+        
+        .details-container.show {
+            opacity: 1;
+            max-height: 1000px;
+        }
+        
+        .details-box {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .details-box h3 {
+            color: #333;
+            font-size: 24px;
+            margin: 0 0 20px 0;
+            text-align: center;
+        }
+        
+        .details-box ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .details-box li {
+            color: #555;
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .details-box li:before {
+            content: "•";
+            color: #004a99;
+            font-size: 28px;
+            position: absolute;
+            left: 0;
+            top: -5px;
+        }
+        
+        .details-box li:last-child {
+            margin-bottom: 0;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .green {
+                grid-column: span 1;
+            }
+            .details-box {
+                padding: 20px;
+            }
+            .details-box li {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Help me understand... which one is currently the biggest headache for you?</h1>
+    <div class="container">
+        <div class="box red" onclick="select(this, 'compliance')">
+            <h2>Compliance & HR</h2>
+            <p>Are the paperwork & legal updates stealing your evenings?</p>
+        </div>
+        <div class="box orange" onclick="select(this, 'advocacy')">
+            <h2>Advocacy</h2>
+            <p>Do you feel like you're fighting tax hikes by yourself?</p>
+        </div>
+        <div class="box green" onclick="select(this, 'savings')">
+            <h2>Savings</h2>
+            <p>Or is the biggest friction just the rising cost of overhead and processing?</p>
+        </div>
+    </div>
+    <div class="footer">Which is your #1 headache?</div>
+    
+    <div class="details-container" id="detailsContainer">
+        <div class="details-box">
+            <h3 id="detailsTitle"></h3>
+            <ul id="detailsList"></ul>
+        </div>
+    </div>
+    
+    <script>
+        const detailsData = {
+            compliance: {
+                title: "Compliance & HR",
+                questions: [
+                    "If a Ministry inspector walked in today, would your paperwork actually protect you, or would it be an expensive afternoon?",
+                    "Are you the one spending your Sundays researching legal updates, or are you paying someone else just to be a government clerk?",
+                    "How much of this administrative weight is stealing from the family time you worked so hard to create?"
+                ]
+            },
+            advocacy: {
+                title: "Advocacy",
+                questions: [
+                    "When the government moves the goalposts on your cash flow, do you have a seat at the table to push back?",
+                    "Do you have the Muscle of 100,000 voices behind you, or are you currently fighting every tax hike entirely on your own?",
+                    "Does the stress of being a 'lone target' for new regulations make it harder to switch off when you finally get home?"
+                ]
+            },
+            savings: {
+                title: "Savings",
+                questions: [
+                    "Aside from the rebates I showed you, where is the biggest leak in your profit right now—is it overhead or hidden fees?",
+                    "If we plugged those leaks today, would that extra cash stay in the business or go toward your personal goals?",
+                    "Would recovering that lost profit be the difference in finally taking a real vacation with the family this year?"
+                ]
+            }
+        };
+        
+        function select(el, category) {
+            const boxes = document.querySelectorAll('.box');
+            const detailsContainer = document.getElementById('detailsContainer');
+            const detailsTitle = document.getElementById('detailsTitle');
+            const detailsList = document.getElementById('detailsList');
+            const isAlreadySelected = el.classList.contains('selected');
+            
+            boxes.forEach(b => {
+                b.classList.remove('selected', 'dimmed');
+            });
+            
+            if (!isAlreadySelected) {
+                boxes.forEach(b => {
+                    if (b !== el) b.classList.add('dimmed');
+                });
+                el.classList.add('selected');
+                
+                // Show details
+                const data = detailsData[category];
+                detailsTitle.textContent = data.title;
+                detailsList.innerHTML = data.questions.map(q => `<li>${q}</li>`).join('');
+                detailsContainer.classList.add('show');
+                
+                // Smooth scroll to details
+                setTimeout(() => {
+                    detailsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 300);
+            } else {
+                // Hide details if clicking the same box again
+                detailsContainer.classList.remove('show');
+            }
+        }
+    </script>
+</body>
+</html>
