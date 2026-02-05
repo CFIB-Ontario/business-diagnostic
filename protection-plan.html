@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Business Protection Plan | CFIB Durham</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f4f7f9;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px 0 30px 0;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header h1 {
+            color: #D31145;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #656465;
+            font-size: 16px;
+        }
+        
+        .back-link {
+            display: inline-block;
+            color: #254B87;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .back-link:hover {
+            color: #D31145;
+        }
+        
+        .progress-bar {
+            max-width: 900px;
+            margin: 0 auto 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+        
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #e0e0e0;
+            z-index: 0;
+        }
+        
+        .progress-fill {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            height: 3px;
+            background: #20AA3F;
+            transition: width 0.3s ease;
+            z-index: 1;
+        }
+        
+        .step {
+            position: relative;
+            text-align: center;
+            flex: 1;
+            z-index: 2;
+        }
+        
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+        
+        .step.active .step-circle {
+            border-color: #254B87;
+            background: #254B87;
+            color: white;
+        }
+        
+        .step.completed .step-circle {
+            border-color: #20AA3F;
+            background: #20AA3F;
+            color: white;
+        }
+        
+        .step-label {
+            font-size: 12px;
+            color: #656465;
+            font-weight: 600;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .wizard-step {
+            display: none;
+        }
+        
+        .wizard-step.active {
+            display: block;
+        }
+        
+        .step-title {
+            color: #254B87;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .step-subtitle {
+            color: #656465;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+        
+        .option-grid {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .option-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .option-card:hover {
+            border-color: #254B87;
+            background: #f8f9fa;
+        }
+        
+        .option-card.selected {
+            border-color: #D31145;
+            background: #fff5f7;
+        }
+        
+        .option-card input[type="checkbox"],
+        .option-card input[type="radio"] {
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        .option-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        
+        .option-content {
+            flex: 1;
+        }
+        
+        .option-card .option-title {
+            font-weight: 700;
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .option-card .option-desc {
+            font-size: 14px;
+            color: #656465;
+            line-height: 1.5;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .btn-primary {
+            background-color: #D31145;
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-primary:hover {
+            background-color: #254B87;
+        }
+        
+        .btn-secondary {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #656465;
+            color: white;
+        }
+        
+        /* Results Page Styles */
+        .results-container {
+            display: none;
+        }
+        
+        .results-container.show {
+            display: block;
+        }
+        
+        .report-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 3px solid #e0e0e0;
+        }
+        
+        .report-header h2 {
+            color: #254B87;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .report-header .business-name {
+            color: #D31145;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .protection-score-section {
+            background: linear-gradient(135deg, #254B87 0%, #D31145 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .protection-score-section h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+        
+        .score-display {
+            font-size: 72px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .score-gauge {
+            width: 100%;
+            max-width: 400px;
+            height: 30px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+            margin: 0 auto 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .score-gauge-fill {
+            height: 100%;
+            border-radius: 15px;
+            transition: width 0.5s ease;
+        }
+        
+        .score-label {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .identified-pressures {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .identified-pressures h3 {
+            color: #254B87;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .pressure-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .pressure-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #D31145;
+        }
+        
+        .pressure-item .icon {
+            font-size: 24px;
+        }
+        
+        .pressure-item .text {
+            font-size: 16px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .roi-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .roi-section h3 {
+            color: #254B87;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .roi-highlight {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #20AA3F;
+        }
+        
+        .roi-highlight h4 {
+            color: #20AA3F;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .roi-amount {
+            font-size: 36px;
+            font-weight: 700;
+            color: #20AA3F;
+            margin-bottom: 10px;
+        }
+        
+        .roi-detail {
+            font-size: 14px;
+            color: #656465;
+            line-height: 1.6;
+        }
+        
+        .toolkit-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .toolkit-section h3 {
+            color: #254B87;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .toolkit-item {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #254B87;
+        }
+        
+        .toolkit-item h4 {
+            color: #254B87;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .toolkit-item p {
+            color: #656465;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        
+        .next-steps {
+            background: linear-gradient(135deg, #20AA3F 0%, #254B87 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .next-steps h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .next-steps .cta-text {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .next-steps .membership-info {
+            background: rgba(255,255,255,0.15);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .next-steps .membership-info .cost {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .disclaimer-small {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.5;
+            text-align: left;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+            }
+            .score-display {
+                font-size: 56px;
+            }
+            .report-header h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="index.html" class="back-link">← Back to Diagnostic</a>
+        <h1>Build Your Protection Plan</h1>
+        <p>4 quick questions to build your custom roadmap</p>
+    </div>
+    
+    <div class="progress-bar">
+        <div class="progress-steps">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            <div class="step active" data-step="1">
+                <div class="step-circle">1</div>
+                <div class="step-label">Pressures</div>
+            </div>
+            <div class="step" data-step="2">
+                <div class="step-circle">2</div>
+                <div class="step-label">Context</div>
+            </div>
+            <div class="step" data-step="3">
+                <div class="step-circle">3</div>
+                <div class="step-label">Impact</div>
+            </div>
+            <div class="step" data-step="4">
+                <div class="step-circle">4</div>
+                <div class="step-label">Goal</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Step 1: Current Pressures -->
+        <div class="wizard-step active" id="step1">
+            <h2 class="step-title">Step 1: The "Pulse Check"</h2>
+            <p class="step-subtitle">Select all current pressures affecting your business</p>
+            
+            <div class="option-grid">
+                <label class="option-card">
+                    <input type="checkbox" name="pressure" value="costs">
+                    <div class="option-content">
+                        <div class="option-title">Rising Costs & Inflation</div>
+                        <div class="option-desc">High taxes, hydro rates, and merchant fees eating into profits</div>
+                    </div>
+                </label>
+                
+                <label class="option-card">
+                    <input type="checkbox" name="pressure" value="redtape">
+                    <div class="option-content">
+                        <div class="option-title">Red Tape & Regulation</div>
+                        <div class="option-desc">HR compliance, WSIB, and overwhelming government paperwork</div>
+                    </div>
+                </label>
+                
+                <label class="option-card">
+                    <input type="checkbox" name="pressure" value="staffing">
+                    <div class="option-content">
+                        <div class="option-title">Staffing & Talent</div>
+                        <div class="option-desc">Finding and keeping good staff, managing labor law changes</div>
+                    </div>
+                </label>
+                
+                <label class="option-card">
+                    <input type="checkbox" name="pressure" value="brand">
+                    <div class="option-content">
+                        <div class="option-title">Brand Awareness</div>
+                        <div class="option-desc">Struggling to promote your business with limited resources</div>
+                    </div>
+                </label>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-secondary" style="visibility: hidden;">Previous</button>
+                <button class="btn btn-primary" onclick="nextStep(2)">Next →</button>
+            </div>
+        </div>
+        
+        <!-- Step 2: Business Type -->
+        <div class="wizard-step" id="step2">
+            <h2 class="step-title">Step 2: The "Context"</h2>
+            <p class="step-subtitle">What type of business do you run?</p>
+            
+            <div class="option-grid">
+                <label class="option-card">
+                    <input type="radio" name="businessType" value="retail">
+                    <div class="option-content">
+                        <div class="option-title">Retail</div>
+                        <div class="option-desc">High merchant fees, inventory shipping challenges</div>
+                    </div>
+                </label>
+                
+                <label class="option-card">
+                    <input type="radio" name="businessType" value="hospitality">
+                    <div class="option-content">
+                        <div class="option-title">Hospitality/Restaurant</div>
+                        <div class="option-desc">High wage pressure, specific health regulations</div>
+                    </div>
+                </label>
+                
+                <label class="option-card">
+                    <input type="radio" name="businessType" value="professional">
+                    <div class="option-content">
+                        <div class="option-title">Professional Services</div>
+                        <div class="option-desc">High legal/HR risk, document heavy operations</div>
+                    </div>
+                </label>
+                
+                <label class="option-card">
+                    <input type="radio" name="businessType" value="manufacturing">
+                    <div class="option-content">
+                        <div class="option-title">Manufacturing/Trades</div>
+                        <div class="option-desc">WSIB focus, safety compliance, high energy costs</div>
+                    </div>
+                </label>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="prevStep(1)">← Previous</button>
+                <button class="btn btn-primary" onclick="nextStep(3)">Next →</button>
+            </div>
+        </div>
+        
+        <!-- Step 3: Business Size -->
+        <div class="wizard-step" id="step3">
+            <h2 class="step-title">Step 3: The "Impact"</h2>
+            <p class="step-subtitle">How many people do you employ?</p>
+            
+            <div class="option-grid">
+                <label class="option-card">
+                    <input type="radio" name="businessSize" value="solo">
+                    <div class="option-content">
+                        <div class="option-title">Solo/Micro (0-4 staff)</div>
+                        <div class="option-desc">Focus on time-saving and basic protection</div>
+                    </div>
+                </label>
+                
+                <label class="option-card">
+                    <input type="radio" name="businessSize" value="growth">
+                    <div class="option-content">
+                        <div class="option-title">Growth (5-19 staff)</div>
+                        <div class="option-desc">HR automation and risk reduction priorities</div>
+                    </div>
+                </label>
+                
+                <label class="option-card">
+                    <input type="radio" name="businessSize" value="established">
+                    <div class="option-content">
+                        <div class="option-title">Established (20+ staff)</div>
+                        <div class="option-desc">Massive savings on merchant fees and complex HR support</div>
+                    </div>
+                </label>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="prevStep(2)">← Previous</button>
+                <button class="btn btn-primary" onclick="nextStep(4)">Next →</button>
+            </div>
+        </div>
+        
+        <!-- Step 4: Top Priority -->
+        <div class="wizard-step" id="step4">
+            <h2 class="step-title">Step 4: The "Goal"</h2>
+            <p class="step-subtitle">What's your #1 priority right now?</p>
+            
+            <div class="option-grid">
+                <label class="option-card">
+                    <input type="radio" name="priority" value="overhead">
+                    <div class="option-content">
+                        <div class="option-title">Cut My Overhead Immediately</div>
+                        <div class="option-desc">Focus on ROI, rebates, and immediate savings</div>
+                    </div>
+                </label>
+                
+                <label class="option-card">
+                    <input type="radio" name="priority" value="legal">
+                    <div class="option-content">
+                        <div class="option-title">Worried About Legal/HR Mistakes</div>
+                        <div class="option-desc">Access to advisors and compliance templates</div>
+                    </div>
+                </label>
+                
+                <label class="option-card">
+                    <input type="radio" name="priority" value="advocacy">
+                    <div class="option-content">
+                        <div class="option-title">Want My Voice Heard</div>
+                        <div class="option-desc">Representation at Queen's Park and Ottawa</div>
+                    </div>
+                </label>
+                
+                <label class="option-card">
+                    <input type="radio" name="priority" value="time">
+                    <div class="option-content">
+                        <div class="option-title">Need More Hours in My Day</div>
+                        <div class="option-desc">Time recovery tools and automation</div>
+                    </div>
+                </label>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="prevStep(3)">← Previous</button>
+                <button class="btn btn-primary" onclick="generateReport()">Generate My Report →</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Results Container -->
+    <div class="results-container" id="resultsContainer">
+        <div class="container">
+            <div class="report-header">
+                <h2>Your Business Diagnostic Report</h2>
+                <div class="business-name" id="businessNameDisplay">Durham Business Owner</div>
+            </div>
+            
+            <div class="protection-score-section">
+                <h3>YOUR BUSINESS PROTECTION SCORE</h3>
+                <div class="score-display" id="scoreDisplay">0/100</div>
+                <div class="score-gauge">
+                    <div class="score-gauge-fill" id="scoreGaugeFill" style="width: 0%"></div>
+                </div>
+                <div class="score-label" id="scoreLabel">Calculating...</div>
+            </div>
+            
+            <div class="identified-pressures">
+                <h3>Identified Pressures</h3>
+                <div class="pressure-list" id="pressureList"></div>
+            </div>
+            
+            <div class="roi-section">
+                <h3>Tangible Recovery Potential</h3>
+                <div id="roiContent"></div>
+            </div>
+            
+            <div class="toolkit-section">
+                <h3>Your Protection Toolkit</h3>
+                <div id="toolkitContent"></div>
+            </div>
+            
+            <div class="next-steps">
+                <h3>The Brutally Honest Next Steps</h3>
+                <div class="cta-text" id="ctaText"></div>
+                <div class="membership-info">
+                    <p>Monthly Membership Investment</p>
+                    <div class="cost" id="membershipCostDisplay">$34-$49/month</div>
+                    <p style="opacity: 0.9; font-size: 14px;">Based on your team size</p>
+                </div>
+                
+                <div class="disclaimer-small">
+                    <strong>Important:</strong> These figures are conservative estimates based on current Ontario market rates and CFIB partner negotiated averages. Real-world savings may vary based on your specific vendor contracts.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentStep = 1;
+        const formData = {
+            pressures: [],
+            businessType: '',
+            businessSize: '',
+            priority: ''
+        };
+        
+        // Handle visual selection feedback
+        document.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(input => {
+            input.addEventListener('change', function() {
+                const card = this.closest('.option-card');
+                
+                if (this.type === 'checkbox') {
+                    card.classList.toggle('selected', this.checked);
+                } else if (this.type === 'radio') {
+                    // Remove selected from all cards in the same group
+                    document.querySelectorAll(`input[name="${this.name}"]`).forEach(radio => {
+                        radio.closest('.option-card').classList.remove('selected');
+                    });
+                    // Add selected to this card
+                    if (this.checked) {
+                        card.classList.add('selected');
+                    }
+                }
+            });
+        });
+        
+        function updateProgress(step) {
+            const progress = ((step - 1) / 3) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            document.querySelectorAll('.step').forEach((s, idx) => {
+                const stepNum = idx + 1;
+                s.classList.remove('active', 'completed');
+                
+                if (stepNum < step) {
+                    s.classList.add('completed');
+                } else if (stepNum === step) {
+                    s.classList.add('active');
+                }
+            });
+        }
+        
+        function nextStep(step) {
+            // Validate current step
+            if (currentStep === 1) {
+                const checked = document.querySelectorAll('input[name="pressure"]:checked');
+                if (checked.length === 0) {
+                    alert('Please select at least one current pressure');
+                    return;
+                }
+            } else if (currentStep === 2) {
+                const selected = document.querySelector('input[name="businessType"]:checked');
+                if (!selected) {
+                    alert('Please select your business type');
+                    return;
+                }
+            } else if (currentStep === 3) {
+                const selected = document.querySelector('input[name="businessSize"]:checked');
+                if (!selected) {
+                    alert('Please select your business size');
+                    return;
+                }
+            }
+            
+            document.getElementById('step' + currentStep).classList.remove('active');
+            document.getElementById('step' + step).classList.add('active');
+            currentStep = step;
+            updateProgress(step);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function prevStep(step) {
+            document.getElementById('step' + currentStep).classList.remove('active');
+            document.getElementById('step' + step).classList.add('active');
+            currentStep = step;
+            updateProgress(step);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function generateReport() {
+            const selected = document.querySelector('input[name="priority"]:checked');
+            if (!selected) {
+                alert('Please select your top priority');
+                return;
+            }
+            
+            // Collect all form data
+            formData.pressures = Array.from(document.querySelectorAll('input[name="pressure"]:checked'))
+                .map(cb => cb.value);
+            formData.businessType = document.querySelector('input[name="businessType"]:checked').value;
+            formData.businessSize = document.querySelector('input[name="businessSize"]:checked').value;
+            formData.priority = selected.value;
+            
+            // Calculate protection score
+            let score = 40; // Base score
+            
+            // Add points for awareness (identified pressures)
+            score += formData.pressures.length * 5;
+            
+            // Deduct points for high-risk situations
+            if (formData.pressures.includes('redtape')) score -= 10;
+            if (formData.businessSize === 'growth' || formData.businessSize === 'established') score -= 5;
+            
+            // Ensure score is between 0-100
+            score = Math.max(0, Math.min(100, score));
+            
+            // Generate report
+            displayReport(score);
+        }
+        
+        function displayReport(score) {
+            // Hide wizard, show results
+            document.querySelector('.progress-bar').style.display = 'none';
+            document.querySelector('.container').style.display = 'none';
+            document.getElementById('resultsContainer').classList.add('show');
+            
+            // Display score
+            document.getElementById('scoreDisplay').textContent = score + '/100';
+            document.getElementById('scoreGaugeFill').style.width = score + '%';
+            
+            // Score color and label
+            let scoreColor, scoreLabel;
+            if (score < 40) {
+                scoreColor = '#D31145';
+                scoreLabel = 'HIGHLY VULNERABLE';
+            } else if (score < 76) {
+                scoreColor = '#f39200';
+                scoreLabel = 'ACTION RECOMMENDED';
+            } else {
+                scoreColor = '#20AA3F';
+                scoreLabel = 'STRONG COVERAGE';
+            }
+            
+            document.getElementById('scoreGaugeFill').style.background = scoreColor;
+            document.getElementById('scoreLabel').textContent = scoreLabel;
+            document.getElementById('scoreLabel').style.color = 'white';
+            
+            // Display pressures
+            const pressureMap = {
+                'costs': { icon: '💰', text: 'Rising Costs & Inflation' },
+                'redtape': { icon: '📋', text: 'Red Tape & Regulation' },
+                'staffing': { icon: '👥', text: 'Staffing & Talent Challenges' },
+                'brand': { icon: '📢', text: 'Brand Awareness & Marketing' }
+            };
+            
+            let pressureHTML = '';
+            formData.pressures.forEach(p => {
+                const pressure = pressureMap[p];
+                pressureHTML += `
+                    <div class="pressure-item">
+                        <div class="icon">${pressure.icon}</div>
+                        <div class="text">${pressure.text}</div>
+                    </div>
+                `;
+            });
+            document.getElementById('pressureList').innerHTML = pressureHTML;
+            
+            // Generate ROI content based on business size
+            let estimatedSavings = 3500;
+            if (formData.businessSize === 'growth') estimatedSavings = 5500;
+            if (formData.businessSize === 'established') estimatedSavings = 8500;
+            
+            document.getElementById('roiContent').innerHTML = `
+                <div class="roi-highlight">
+                    <h4>Estimated Annual Savings</h4>
+                    <div class="roi-amount">$${estimatedSavings.toLocaleString()}</div>
+                    <div class="roi-detail">
+                        Based on typical ${formData.businessType} businesses in the ${formData.businessSize} category utilizing CFIB partner programs for payment processing, payroll services, shipping, and insurance.
+                    </div>
+                </div>
+                <div class="roi-highlight">
+                    <h4>Avoided Professional Fees</h4>
+                    <div class="roi-amount">$1,400</div>
+                    <div class="roi-detail">
+                        Value of 4 advisor consultations @ $350/hr market rate. One call with a CFIB Business Advisor can pay for your entire annual membership.
+                    </div>
+                </div>
+                <div class="roi-highlight">
+                    <h4>Legislative Recovery</h4>
+                    <div class="roi-amount">$980+</div>
+                    <div class="roi-detail">
+                        Canada Carbon Rebate for Small Business (CFIB advocacy win). Ontario businesses with 10 employees average $980 in rebates.
+                    </div>
+                </div>
+            `;
+            
+            // Generate toolkit based on priority
+            let toolkitHTML = '';
+            
+            if (formData.priority === 'overhead') {
+                toolkitHTML = `
+                    <div class="toolkit-item">
+                        <h4>Payment Processing Optimization</h4>
+                        <p>CFIB/Chase negotiated interchange-plus rates typically save businesses $1,500-$3,000 annually compared to flat or tiered pricing.</p>
+                    </div>
+                    <div class="toolkit-item">
+                        <h4>Payroll Services Discount</h4>
+                        <p>40% off Payworks payroll services. For a 5-person team, this typically saves $500-$800 per year.</p>
+                    </div>
+                    <div class="toolkit-item">
+                        <h4>Shipping & Courier Savings</h4>
+                        <p>75% off through Freightcom/ShipTime. Businesses shipping 5+ packages weekly save an average of $3,200 annually.</p>
+                    </div>
+                `;
+            } else if (formData.priority === 'legal') {
+                toolkitHTML = `
+                    <div class="toolkit-item">
+                        <h4>Unlimited Business Advisor Access</h4>
+                        <p>Call anytime for HR, legal, and compliance questions. Market rate: $350/hour. Your rate: Included in membership.</p>
+                    </div>
+                    <div class="toolkit-item">
+                        <h4>HR Document Library</h4>
+                        <p>Employment contracts, handbooks, health & safety policies, and termination letters — all Ontario-compliant templates ready to customize.</p>
+                    </div>
+                    <div class="toolkit-item">
+                        <h4>25% Legal Discount</h4>
+                        <p>Pre-negotiated discounts with employment lawyers for when you need formal representation or retainers.</p>
+                    </div>
+                `;
+            } else if (formData.priority === 'advocacy') {
+                toolkitHTML = `
+                    <div class="toolkit-item">
+                        <h4>100,000 Member Voice</h4>
+                        <p>CFIB represents you at Queen's Park and Ottawa. Recent wins include the Canada Carbon Rebate ($2B+ returned to SMEs) and WSIB surplus distributions.</p>
+                    </div>
+                    <div class="toolkit-item">
+                        <h4>Red Tape Report Card</h4>
+                        <p>CFIB's annual Red Tape Report Card holds governments accountable. Ontario just earned an "A" grade thanks to member-driven pressure.</p>
+                    </div>
+                    <div class="toolkit-item">
+                        <h4>Durham Local Initiatives</h4>
+                        <p>Direct access to Durham Region advocacy efforts on municipal taxes, development charges, and local business regulations.</p>
+                    </div>
+                `;
+            } else if (formData.priority === 'time') {
+                toolkitHTML = `
+                    <div class="toolkit-item">
+                        <h4>Payworks Automation</h4>
+                        <p>Stop doing payroll manually. Automated calculations, direct deposit, T4s, and ROE filings — reclaim 3-5 hours per pay period.</p>
+                    </div>
+                    <div class="toolkit-item">
+                        <h4>On-Demand Advisor Hotline</h4>
+                        <p>Instead of spending hours researching legal updates yourself, call an expert and get an answer in 15 minutes.</p>
+                    </div>
+                    <div class="toolkit-item">
+                        <h4>Template Library</h4>
+                        <p>No more building HR documents from scratch. Download, customize, and deploy Ontario-compliant contracts and policies in minutes.</p>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('toolkitContent').innerHTML = toolkitHTML;
+            
+            // Generate CTA based on score
+            let ctaText = '';
+            if (score < 40) {
+                ctaText = `This roadmap identifies about $${estimatedSavings.toLocaleString()} in yearly recovery potential. Your Protection Score indicates high vulnerability — which means the upside is massive. I can sit down for 15 minutes next week to show you exactly how to flip the switch on those savings. Does Tuesday at 10:00 AM work?`;
+            } else if (score < 76) {
+                ctaText = `You've got some coverage, but there are clear gaps costing you money and time. This roadmap shows $${estimatedSavings.toLocaleString()} in annual recovery. The membership investment pays for itself in less than 3 months. Should we get your profile activated today?`;
+            } else {
+                ctaText = `You're in better shape than most, but even strong businesses leave money on the table. This analysis shows $${estimatedSavings.toLocaleString()} in identified savings — money that's yours to claim. Let's lock those savings in. Should we activate your membership this week?`;
+            }
+            
+            document.getElementById('ctaText').textContent = ctaText;
+            
+            // Calculate membership cost
+            let employees = 5; // Default
+            if (formData.businessSize === 'solo') employees = 2;
+            if (formData.businessSize === 'established') employees = 20;
+            
+            const monthlyCost = 34 + (employees * 3);
+            document.getElementById('membershipCostDisplay').textContent = `$${monthlyCost}/month`;
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
