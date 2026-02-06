@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Business Recovery Plan | CFIB Durham</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Montserrat', sans-serif; background-color: #f4f7f9; min-height: 100vh; padding: 20px; }
+        .header { text-align: center; padding: 20px 0 30px 0; max-width: 1000px; margin: 0 auto; }
+        .header h1 { color: #D31145; font-size: 32px; font-weight: 700; margin-bottom: 10px; }
+        .header p { color: #656465; font-size: 18px; }
+        .back-link { display: inline-block; color: #254B87; text-decoration: none; margin-bottom: 20px; font-weight: 600; font-size: 14px; }
+        .back-link:hover { color: #D31145; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        .protection-score-section { background: linear-gradient(135deg, #254B87 0%, #D31145 100%); color: white; padding: 50px 40px; border-radius: 16px; text-align: center; margin-bottom: 40px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+        .protection-score-section h2 { font-size: 24px; font-weight: 600; margin-bottom: 20px; opacity: 0.95; letter-spacing: 1px; }
+        .score-display { font-size: 96px; font-weight: 700; margin-bottom: 30px; text-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .score-gauge { width: 100%; max-width: 500px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 20px; margin: 0 auto 30px; overflow: hidden; position: relative; }
+        .score-gauge-fill { height: 100%; border-radius: 20px; transition: width 1s ease, background 1s ease; }
+        .score-label { font-size: 22px; font-weight: 700; margin-top: 15px; letter-spacing: 1px; }
+        .score-interpretation { font-size: 16px; opacity: 0.95; margin-top: 15px; line-height: 1.6; max-width: 700px; margin-left: auto; margin-right: auto; }
+        
+        .vulnerabilities-section { background: white; padding: 40px; border-radius: 16px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .vulnerabilities-section h3 { color: #D31145; font-size: 26px; font-weight: 700; margin-bottom: 25px; text-align: center; }
+        .vulnerability-item { display: flex; align-items: flex-start; gap: 20px; padding: 20px; margin-bottom: 15px; background: #fff5f7; border-radius: 12px; border-left: 5px solid #D31145; }
+        .vulnerability-item .icon { font-size: 32px; flex-shrink: 0; }
+        .vulnerability-item .content { flex: 1; }
+        .vulnerability-item .title { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 8px; }
+        .vulnerability-item .impact { font-size: 15px; color: #656465; line-height: 1.5; }
+        .vulnerability-item .cost { font-size: 24px; font-weight: 700; color: #D31145; margin-top: 10px; }
+        
+        .recovery-section { background: linear-gradient(135deg, #20AA3F 0%, #178a32 100%); color: white; padding: 50px 40px; border-radius: 16px; margin-bottom: 30px; box-shadow: 0 8px 24px rgba(32,170,63,0.3); }
+        .recovery-section h3 { font-size: 32px; font-weight: 700; margin-bottom: 15px; text-align: center; }
+        .recovery-section .subtitle { font-size: 18px; opacity: 0.95; margin-bottom: 40px; text-align: center; }
+        
+        .recovery-action { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 30px; border-radius: 12px; margin-bottom: 20px; border-left: 5px solid white; }
+        .recovery-action .action-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .recovery-action .action-icon { font-size: 36px; }
+        .recovery-action .action-title { font-size: 22px; font-weight: 700; }
+        .recovery-action .action-description { font-size: 16px; line-height: 1.6; margin-bottom: 15px; opacity: 0.95; }
+        .recovery-action .action-benefit { background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; font-size: 15px; line-height: 1.5; }
+        .recovery-action .action-benefit strong { display: block; margin-bottom: 5px; font-size: 16px; }
+        .recovery-action .recovery-value { font-size: 32px; font-weight: 700; color: #fff; margin-top: 10px; }
+        
+        .total-recovery { background: white; color: #20AA3F; padding: 40px; border-radius: 16px; text-align: center; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .total-recovery h3 { color: #254B87; font-size: 22px; font-weight: 600; margin-bottom: 15px; }
+        .total-recovery .big-number { font-size: 64px; font-weight: 700; }
+        .total-recovery .comparison { font-size: 18px; color: #656465; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; }
+        .total-recovery .tax-note { 
+            background: linear-gradient(135deg, rgba(32, 170, 63, 0.1) 0%, rgba(37, 75, 135, 0.1) 100%); 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-top: 20px;
+            border-left: 4px solid #20AA3F;
+            text-align: left;
+        }
+        .total-recovery .tax-note strong { 
+            color: #254B87; 
+            display: block; 
+            margin-bottom: 10px; 
+            font-size: 16px;
+        }
+        .total-recovery .tax-calculation {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #333;
+        }
+        .total-recovery .tax-calculation-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+        }
+        .total-recovery .tax-calculation-line.total {
+            border-top: 2px solid #d0d0d0;
+            padding-top: 8px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        .next-steps { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .next-steps h3 { color: #254B87; font-size: 28px; font-weight: 700; margin-bottom: 25px; text-align: center; }
+        .next-steps .cta-text { font-size: 17px; line-height: 1.7; color: #333; margin-bottom: 30px; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        
+        .cta-buttons { display: flex; gap: 20px; justify-content: center; margin-top: 30px; flex-wrap: wrap; }
+        .cta-btn { padding: 18px 35px; border-radius: 10px; font-size: 18px; font-weight: 700; text-decoration: none; transition: all 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .cta-btn-primary { background: #D31145; color: white; }
+        .cta-btn-primary:hover { background: #254B87; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
+        .cta-btn-secondary { background: white; color: #254B87; border: 3px solid #254B87; }
+        .cta-btn-secondary:hover { background: #254B87; color: white; transform: translateY(-2px); }
+        
+        .no-data-message { text-align: center; padding: 60px 40px; background: white; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .no-data-message h2 { color: #254B87; font-size: 28px; margin-bottom: 20px; }
+        .no-data-message p { color: #656465; font-size: 18px; margin-bottom: 30px; }
+        .no-data-message a { display: inline-block; background: #D31145; color: white; padding: 18px 35px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 18px; }
+        
+        @media (max-width: 768px) {
+            .header h1 { font-size: 26px; }
+            .score-display { font-size: 72px; }
+            .vulnerabilities-section, .recovery-section, .next-steps { padding: 30px 25px; }
+            .recovery-action { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="calculator.html" class="back-link">← Back to Calculator</a>
+        <h1>Your Business Recovery Plan</h1>
+        <p>Here's exactly how we'll help you recover those dollars</p>
+    </div>
+    
+    <div class="container" id="mainContent"></div>
+    
+    <script>
+        const PROTECTION_ALGORITHM = {
+            WEIGHTS: { MERCHANT_GAP: 15, HR_LEGAL_GAP: 20, PAYROLL_GAP: 15, TAX_REBATE_GAP: 20, TIME_POVERTY: 15, ADVOCACY_GAP: 15 },
+            
+            calculateScore: function(data) {
+                let score = 100;
+                const vulnerabilities = [];
+                const recoveryActions = [];
+                
+                if (data.cardVolume !== '' && data.cardVolume !== 'none') {
+                    score -= this.WEIGHTS.MERCHANT_GAP;
+                    const saving = data.cardVolume === 'above' ? 3000 : 1500;
+                    vulnerabilities.push({ icon: '💳', title: 'Merchant Processing Gap', impact: 'You're paying higher-than-necessary credit card processing fees. CFIB's preferred merchant rate could cut this cost significantly.', cost: `Losing ~$${saving.toLocaleString()}/year` });
+                    recoveryActions.push({ icon: '💳', title: 'Merchant Processing Optimization', description: 'Switch to CFIB's preferred merchant rate program (Moneris/Square partnerships).', benefit: 'Immediate reduction in processing fees by negotiating enterprise-level rates for small businesses.', value: saving });
+                }
+                
+                if (data.hrConfidence <= 5) {
+                    score -= this.WEIGHTS.HR_LEGAL_GAP;
+                    vulnerabilities.push({ icon: '⚖️', title: 'HR/Legal Compliance Gap', impact: 'Low confidence in HR compliance means you're vulnerable to wrongful dismissal claims, Ministry audits, and expensive legal fixes.', cost: 'Potential $10,000+ liability' });
+                    recoveryActions.push({ icon: '⚖️', title: 'HR Protection & Legal Hotline', description: 'Access to CFIB's HR Toolkit, termination templates, and unlimited legal hotline calls.', benefit: 'Avoid costly mistakes. One prevented wrongful dismissal pays for 10+ years of membership.', value: 1400 });
+                }
+                
+                if (data.payrollMethod === 'self' || data.payrollMethod === 'accountant') {
+                    score -= this.WEIGHTS.PAYROLL_GAP;
+                    vulnerabilities.push({ icon: '📊', title: 'Payroll Inefficiency', impact: 'Manual payroll or accountant-run payroll is time-consuming and error-prone. Automated solutions save time and reduce mistakes.', cost: 'Hidden time cost' });
+                    recoveryActions.push({ icon: '📊', title: 'Payroll Service Discount', description: 'CFIB's partnership with ADP provides member-exclusive rates on payroll automation.', benefit: 'Save time, reduce errors, and get better pricing than going direct.', value: 300 });
+                }
+                
+                if (data.businessStructure !== 'corporation') {
+                    score -= this.WEIGHTS.TAX_REBATE_GAP;
+                    vulnerabilities.push({ icon: '🏛️', title: 'Tax Optimization Gap', impact: 'As a non-incorporated business, you're missing out on Small Business Deduction benefits and corporate tax advantages.', cost: 'Leaving $2,200+/year on table' });
+                    recoveryActions.push({ icon: '🏛️', title: 'Incorporation Strategy Session', description: 'Free consultation with a CFIB Business Advisor to explore whether incorporation makes sense for your situation.', benefit: 'Understand the tax benefits you're missing and the steps to access them.', value: 0 });
+                }
+                
+                if (data.adminHours > 10) {
+                    score -= this.WEIGHTS.TIME_POVERTY;
+                    vulnerabilities.push({ icon: '⏰', title: 'Time Poverty', impact: `You're spending ${data.adminHours} hours/week on admin and compliance — time that could be spent on revenue-generating activities or family.`, cost: `${data.adminHours * 52} hours/year lost` });
+                    recoveryActions.push({ icon: '⏰', title: 'Administrative Offloading', description: 'CFIB's compliance tools, templates, and hotlines handle the research and updates for you.', benefit: `Reclaim ${data.adminHours * 52} hours annually — worth $${(data.adminHours * 52 * 65).toLocaleString()} if redirected to sales or strategic work.`, value: Math.round(data.adminHours * 52 * 65) });
+                }
+                
+                if (data.businessStructure !== 'corporation' || data.legalEvents === 0) {
+                    score -= this.WEIGHTS.ADVOCACY_GAP;
+                    vulnerabilities.push({ icon: '📣', title: 'Advocacy Gap', impact: 'Without CFIB representation, you have no voice when governments increase taxes, change regulations, or impose new costs on your business.', cost: 'No protection from policy changes' });
+                    recoveryActions.push({ icon: '📣', title: 'Legislative Advocacy & Protection', description: 'CFIB represents 100,000 small businesses in government negotiations. Recent wins include EHT exemptions and CPP/EI reductions.', benefit: 'Your membership funds the lobby that keeps your costs down. Estimated value of recent advocacy wins: $2,200+/year per business.', value: 2200 });
+                }
+                
+                return { score, vulnerabilities, recoveryActions };
+            }
+        };
+        
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedData = localStorage.getItem('cfib_calculator_data');
+            if (!savedData) {
+                document.getElementById('mainContent').innerHTML = `
+                    <div class="no-data-message">
+                        <h2>No Calculator Data Found</h2>
+                        <p>Please complete the ROI Calculator first to generate your personalized protection plan.</p>
+                        <a href="calculator.html">Go to Calculator →</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            const data = JSON.parse(savedData);
+            const result = PROTECTION_ALGORITHM.calculateScore(data);
+            generateRecoveryPlan(result, data);
+        });
+        
+        function generateRecoveryPlan(result, data) {
+            let scoreColor, scoreLabel, scoreMessage;
+            if (result.score < 40) {
+                scoreColor = '#D31145'; scoreLabel = 'HIGHLY VULNERABLE'; scoreMessage = 'Your business is exposed to significant operational and financial risks. Immediate action is critical.';
+            } else if (result.score < 76) {
+                scoreColor = '#f39200'; scoreLabel = 'ACTION RECOMMENDED'; scoreMessage = 'You have coverage in some areas, but critical gaps are costing you money and exposing you to risk.';
+            } else {
+                scoreColor = '#20AA3F'; scoreLabel = 'STRONG COVERAGE'; scoreMessage = 'You\'re in better shape than most, but there are still opportunities to optimize and protect.';
+            }
+            
+            const totalRecovery = result.recoveryActions.reduce((sum, action) => sum + action.value, 0);
+            const membershipCost = (34 + (data.employees * 3)) * 12;
+            
+            // Tax deduction calculation (30% bracket)
+            const taxSavings = Math.round(membershipCost * 0.30);
+            const afterTaxCost = membershipCost - taxSavings;
+            const netGain = totalRecovery - afterTaxCost;
+            
+            let html = `<div class="protection-score-section"><h2>YOUR BUSINESS PROTECTION SCORE</h2><div class="score-display">${result.score}/100</div><div class="score-gauge"><div class="score-gauge-fill" style="width: ${result.score}%; background: ${scoreColor};"></div></div><div class="score-label">${scoreLabel}</div><div class="score-interpretation">${scoreMessage}</div></div>`;
+            
+            if (result.vulnerabilities.length > 0) {
+                html += `<div class="vulnerabilities-section"><h3>🚨 Identified Vulnerabilities</h3>`;
+                result.vulnerabilities.forEach(vuln => {
+                    html += `<div class="vulnerability-item"><div class="icon">${vuln.icon}</div><div class="content"><div class="title">${vuln.title}</div><div class="impact">${vuln.impact}</div><div class="cost">${vuln.cost}</div></div></div>`;
+                });
+                html += `</div>`;
+            }
+            
+            html += `<div class="recovery-section"><h3>✅ Your Recovery Roadmap</h3><div class="subtitle">Here's exactly how CFIB will help you recover these dollars</div>`;
+            result.recoveryActions.forEach(action => {
+                html += `<div class="recovery-action"><div class="action-header"><div class="action-icon">${action.icon}</div><div class="action-title">${action.title}</div></div><div class="action-description">${action.description}</div><div class="action-benefit"><strong>Direct Benefit:</strong> ${action.benefit}</div><div class="recovery-value">Recovery: $${action.value.toLocaleString()}/year</div></div>`;
+            });
+            html += `</div>`;
+            
+            html += `<div class="total-recovery">
+                <h3>TOTAL ANNUAL RECOVERY POTENTIAL</h3>
+                <div class="big-number">$${totalRecovery.toLocaleString()}</div>
+                <div class="comparison">
+                    <strong>Your Investment:</strong> $${membershipCost.toLocaleString()}/year ($${Math.round(membershipCost/12)}/month)<br>
+                    <strong style="color: #20AA3F; font-size: 16px; display: inline-flex; align-items: center; gap: 5px; margin-top: 10px;">
+                        💰 Tax Deductible (30% bracket): -$${taxSavings.toLocaleString()}
+                    </strong><br>
+                    <strong style="font-size: 18px; margin-top: 10px; display: block;">Real After-Tax Cost: $${afterTaxCost.toLocaleString()}/year</strong><br>
+                    <strong>Net Gain:</strong> <span style="color: #20AA3F; font-size: 24px; font-weight: 700;">$${netGain.toLocaleString()}</span>
+                </div>
+                <div class="tax-note">
+                    <strong>💰 100% Tax Deductible Business Expense</strong>
+                    <div class="tax-calculation">
+                        <div class="tax-calculation-line">
+                            <span>Annual Membership:</span>
+                            <span>$${membershipCost.toLocaleString()}</span>
+                        </div>
+                        <div class="tax-calculation-line">
+                            <span>Tax Deduction (30% bracket):</span>
+                            <span style="color: #20AA3F; font-weight: 600;">-$${taxSavings.toLocaleString()}</span>
+                        </div>
+                        <div class="tax-calculation-line total">
+                            <span>Actual After-Tax Cost:</span>
+                            <span style="color: #254B87;">$${afterTaxCost.toLocaleString()}/year</span>
+                        </div>
+                        <div style="margin-top: 15px; font-size: 14px; color: #656465; line-height: 1.5;">
+                            As a registered non-profit, CFIB memberships are 100% tax-deductible business expenses. This reduces your effective membership cost by 26-50% depending on your tax bracket.
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+            
+            // Calculate projected score after recovery
+            const projectedScore = Math.min(95, result.score + 45); // Recovery can add up to 45 points
+            const currentRiskLevel = result.score < 40 ? 'Highly Vulnerable' : result.score < 76 ? 'At Risk' : 'Strong';
+            
+            // Build transformation statement
+            let transformStatement = `<div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 30px; border-radius: 12px; margin-bottom: 30px; border-left: 5px solid #254B87;">
+                <h4 style="color: #254B87; font-size: 22px; font-weight: 700; margin-bottom: 20px; text-align: center;">Your Transformation Roadmap</h4>
+                <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: center; max-width: 800px; margin: 0 auto;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 14px; color: #656465; margin-bottom: 8px; font-weight: 600;">CURRENT STATE</div>
+                        <div style="font-size: 48px; font-weight: 700; color: #D31145; margin-bottom: 5px;">${result.score}/100</div>
+                        <div style="font-size: 16px; color: #656465; font-weight: 600;">${currentRiskLevel}</div>
+                        <div style="margin-top: 15px; font-size: 14px; color: #333; line-height: 1.5;">
+                            Currently losing <strong style="color: #D31145;">$${totalRecovery.toLocaleString()}</strong> to operational leaks`;
+            
+            // Add HR liability mention if applicable
+            const hasHRGap = result.vulnerabilities.some(v => v.title === 'HR/Legal Compliance Gap');
+            if (hasHRGap) {
+                transformStatement += ` and exposed to <strong style="color: #D31145;">$10,000+</strong> in potential HR liabilities`;
+            }
+            
+            transformStatement += `.</div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <div style="font-size: 32px; color: #20AA3F;">→</div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <div style="font-size: 14px; color: #656465; margin-bottom: 8px; font-weight: 600;">WITH CFIB</div>
+                        <div style="font-size: 48px; font-weight: 700; color: #20AA3F; margin-bottom: 5px;">${projectedScore}/100</div>
+                        <div style="font-size: 16px; color: #20AA3F; font-weight: 600;">Protected</div>
+                        <div style="margin-top: 15px; font-size: 14px; color: #333; line-height: 1.5;">
+                            Recovery plan implemented, money back in your pocket, HR protection in place.
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 25px; padding-top: 25px; border-top: 2px solid #d0d0d0;">
+                    <p style="font-size: 17px; color: #333; line-height: 1.6; margin-bottom: 15px;">
+                        <strong>For an after-tax investment of ~$${Math.round(afterTaxCost/12)}/month</strong> (or $${Math.round(membershipCost/12)}/month before tax savings), we can implement the Recovery Plan above, moving your score to ${projectedScore}+ and putting that money back where it belongs—<strong style="color: #20AA3F;">in your business</strong>.
+                    </p>
+                </div>
+            </div>`;
+            
+            html += transformStatement;
+            
+            const ctaMessage = result.score < 40 
+                ? `Your Protection Score of ${result.score}/100 indicates serious vulnerability. The good news? We've identified exactly how to fix it. I can walk you through this roadmap in 15 minutes and show you how to activate these solutions. Are you available Tuesday at 10:00 AM?`
+                : result.score < 76
+                ? `You're not in crisis, but you're at risk. The Recovery Plan above closes your gaps and moves you to ${projectedScore}/100. After tax savings, the membership pays for itself in under 2 months. Should we activate your profile this week?`
+                : `Even with a strong score of ${result.score}/100, we've found opportunities to optimize to ${projectedScore}/100. Let's lock in these protections and savings. Ready to activate?`;
+            
+            html += `<div class="next-steps"><h3>The Brutally Honest Next Steps</h3><div class="cta-text">${ctaMessage}</div><div class="cta-buttons"><a href="mailto:jason@cfib-durham.ca?subject=Recovery Plan - Protection Score ${result.score}" class="cta-btn cta-btn-primary">📧 Schedule My Recovery Call</a><a href="index.html" class="cta-btn cta-btn-secondary">🔄 Start Over</a></div></div>`;
+            
+            document.getElementById('mainContent').innerHTML = html;
+        }
+    </script>
+</body>
+</html>

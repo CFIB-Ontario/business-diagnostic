@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ROI & Time Calculator | CFIB Durham</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f4f7f9;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px 0 30px 0;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header h1 {
+            color: #D31145;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #656465;
+            font-size: 16px;
+        }
+        
+        .back-link {
+            display: inline-block;
+            color: #254B87;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .back-link:hover {
+            color: #D31145;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .form-section h3 {
+            color: #254B87;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .question {
+            margin-bottom: 25px;
+        }
+        
+        .question label {
+            display: block;
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .question input[type="text"],
+        .question input[type="number"],
+        .question select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Montserrat', sans-serif;
+            transition: border-color 0.3s;
+        }
+        
+        .question input[type="text"]:focus,
+        .question input[type="number"]:focus,
+        .question select:focus {
+            outline: none;
+            border-color: #254B87;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+        
+        .checkbox-item label {
+            font-weight: 400;
+            cursor: pointer;
+            margin: 0;
+            line-height: 1.4;
+        }
+        
+        .calculate-btn {
+            background-color: #D31145;
+            color: white;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 30px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .calculate-btn:hover {
+            background-color: #254B87;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .results {
+            display: none;
+            margin-top: 40px;
+            padding: 40px;
+            background: linear-gradient(135deg, #254B87 0%, #D31145 100%);
+            border-radius: 12px;
+            color: white;
+        }
+        
+        .results.show {
+            display: block;
+        }
+        
+        .results h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .result-card {
+            background: rgba(255,255,255,0.15);
+            padding: 20px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .result-card h4 {
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .result-card .amount {
+            font-size: 36px;
+            font-weight: 700;
+        }
+        
+        .result-card .detail {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 8px;
+        }
+        
+        .tax-deductible-badge {
+            background: rgba(32, 170, 63, 0.2);
+            border: 2px solid rgba(255,255,255,0.5);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        .tax-deductible-badge .badge-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .tax-deductible-badge .badge-detail {
+            font-size: 13px;
+            opacity: 0.95;
+            line-height: 1.4;
+        }
+        
+        .tax-breakdown {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .tax-breakdown-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .tax-breakdown-line:last-child {
+            margin-bottom: 0;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255,255,255,0.3);
+            font-weight: 700;
+            font-size: 15px;
+        }
+        
+        .total-savings {
+            background: white;
+            color: #20AA3F;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .total-savings h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #656465;
+        }
+        
+        .total-savings .amount {
+            font-size: 48px;
+            font-weight: 700;
+        }
+        
+        .total-savings .summary {
+            font-size: 16px;
+            color: #656465;
+            margin-top: 15px;
+        }
+        
+        .breakdown-section {
+            background: white;
+            color: #333;
+            padding: 40px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+        
+        .breakdown-section h3 {
+            color: #254B87;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .breakdown-item .label {
+            flex: 1;
+            font-size: 15px;
+            color: #656465;
+            line-height: 1.5;
+        }
+        
+        .breakdown-item .value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #20AA3F;
+        }
+        
+        .cta-section {
+            background: white;
+            color: #333;
+            padding: 40px;
+            border-radius: 12px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .cta-section h3 {
+            color: #254B87;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .cta-section p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #656465;
+            margin-bottom: 30px;
+        }
+        
+        .cta-btn {
+            display: inline-block;
+            background-color: #D31145;
+            color: white;
+            padding: 18px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 18px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin: 0 10px 10px 0;
+            border: none;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .cta-btn:hover {
+            background-color: #254B87;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .cta-btn-secondary {
+            background-color: white;
+            color: #254B87;
+            border: 2px solid #254B87;
+        }
+        
+        .cta-btn-secondary:hover {
+            background-color: #254B87;
+            color: white;
+        }
+        
+        #otherIndustryField {
+            display: none;
+            margin-top: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 25px;
+            }
+            .results {
+                padding: 25px;
+            }
+            .breakdown-section, .cta-section {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="index.html" class="back-link">← Back to Diagnostic</a>
+        <h1>💰 ROI & Time Recovery Calculator</h1>
+        <p>Let's calculate your actual return</p>
+    </div>
+    
+    <div class="container">
+        <form id="calculatorForm">
+            <div class="form-section">
+                <h3>📋 Business Profile</h3>
+                
+                <div class="question">
+                    <label for="businessName">Business Name (optional)</label>
+                    <input type="text" id="businessName" placeholder="e.g., Durham Coffee Co.">
+                </div>
+                
+                <div class="question">
+                    <label for="cityLocation">City/Location (optional)</label>
+                    <input type="text" id="cityLocation" placeholder="e.g., Oshawa, Whitby, Ajax, Pickering...">
+                </div>
+                
+                <div class="question">
+                    <label for="businessStructure">Business Structure</label>
+                    <select id="businessStructure" required>
+                        <option value="">Select...</option>
+                        <option value="sole_proprietor">Sole Proprietor</option>
+                        <option value="partnership">Partnership</option>
+                        <option value="corporation">Corporation</option>
+                    </select>
+                </div>
+                
+                <div class="question">
+                    <label for="employees">Number of Employees</label>
+                    <input type="number" id="employees" min="0" max="1000" required placeholder="e.g., 5">
+                </div>
+                
+                <div class="question">
+                    <label for="industry">Industry</label>
+                    <select id="industry" required onchange="toggleOtherIndustry()">
+                        <option value="">Select...</option>
+                        <option value="retail">Retail</option>
+                        <option value="food_beverage">Food & Beverage</option>
+                        <option value="professional_services">Professional Services</option>
+                        <option value="construction">Construction</option>
+                        <option value="manufacturing">Manufacturing</option>
+                        <option value="healthcare">Healthcare</option>
+                        <option value="technology">Technology</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div id="otherIndustryField">
+                    <div class="question">
+                        <label for="industryOther">Please specify your industry</label>
+                        <input type="text" id="industryOther" placeholder="e.g., Automotive Repair">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3>💳 Operational Details</h3>
+                
+                <div class="question">
+                    <label for="cardVolume">Credit Card Processing Volume (monthly)</label>
+                    <select id="cardVolume" required>
+                        <option value="">Select...</option>
+                        <option value="none">No card processing / Very minimal</option>
+                        <option value="below">Less than $50,000/month</option>
+                        <option value="above">More than $50,000/month</option>
+                    </select>
+                </div>
+                
+                <div class="question">
+                    <label for="payrollMethod">Payroll Method</label>
+                    <select id="payrollMethod" required>
+                        <option value="">Select...</option>
+                        <option value="self">I do it myself</option>
+                        <option value="accountant">My accountant does it</option>
+                        <option value="service">I use a payroll service (ADP, Ceridian, etc.)</option>
+                    </select>
+                </div>
+                
+                <div class="question">
+                    <label for="shipping">Do you ship products?</label>
+                    <select id="shipping" required>
+                        <option value="">Select...</option>
+                        <option value="yes">Yes, regularly</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3>⏰ Time & Compliance</h3>
+                
+                <div class="question">
+                    <label for="adminHours">How many hours per week do you spend on admin/compliance?</label>
+                    <input type="number" id="adminHours" min="0" max="80" required placeholder="e.g., 10">
+                </div>
+                
+                <div class="question">
+                    <label for="hrConfidence">HR Confidence Level (1-10)</label>
+                    <input type="number" id="hrConfidence" min="1" max="10" required placeholder="1 = Very uncertain, 10 = Very confident">
+                </div>
+                
+                <div class="question">
+                    <label>Legal/Health Check - Select all that apply in the last 3 years:</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="legal1" value="employment_changes">
+                            <label for="legal1">Employment Changes: Did you hire or let go of anyone?</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="legal2" value="policy_updates">
+                            <label for="legal2">Policy Updates: Did you have to update your Employee Handbook or Health & Safety policy?</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="legal3" value="contract_reviews">
+                            <label for="legal3">Contract Reviews: Did a lawyer look at a commercial lease, a partnership agreement, or a vendor contract for you?</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="legal4" value="general_advice">
+                            <label for="legal4">General Advice: Did you call a consultant or lawyer for a "quick question" regarding a dispute or HR issue?</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="calculate-btn">Calculate My ROI</button>
+        </form>
+        
+        <div class="results" id="results">
+            <h2>📊 Your Recovery Potential</h2>
+            
+            <div class="results-grid">
+                <div class="result-card">
+                    <h4>Total Annual Savings</h4>
+                    <div class="amount" id="totalSavings">$0</div>
+                </div>
+                <div class="result-card">
+                    <h4>Your Membership</h4>
+                    <div class="amount" id="membershipCost">$0</div>
+                    <div class="detail" id="annualCost"></div>
+                    <div class="tax-deductible-badge">
+                        <div class="badge-title">💰 100% Tax Deductible</div>
+                        <div class="badge-detail">As a business expense</div>
+                    </div>
+                    <div class="tax-breakdown" id="taxBreakdown"></div>
+                </div>
+            </div>
+            
+            <div class="total-savings">
+                <h3>Net Benefit (Year 1)</h3>
+                <div class="amount">$<span id="netBenefit">0</span></div>
+                <div class="summary" id="roiSummary"></div>
+            </div>
+            
+            <div class="breakdown-section">
+                <h3>💵 Your Savings Breakdown</h3>
+                <div id="breakdownList"></div>
+            </div>
+            
+            <div class="breakdown-section">
+                <h3>⏰ Time Recovery Value</h3>
+                <div id="timeRecovery"></div>
+            </div>
+            
+            <div class="cta-section">
+                <h3>Ready to Activate Your Recovery Plan?</h3>
+                <p>Now that you've seen the numbers, let's build your personalized protection plan and show you exactly how we'll help you recover these dollars.</p>
+                <button onclick="downloadPDF()" class="cta-btn">📄 Download My Results (PDF)</button>
+                <a href="protection-plan.html" class="cta-btn">🛡️ Build My Protection Plan</a>
+                <a href="index.html" class="cta-btn cta-btn-secondary">← Back to Diagnostic</a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const RECOVERY_CALCULATOR = {
+            CONSTANTS: {
+                BASE_MEMBERSHIP: 34,
+                PER_EMPLOYEE: 3,
+                OWNER_TIME_VALUE: 65
+            }
+        };
+        
+        // Store results globally for PDF generation
+        let calculationResults = null;
+        
+        document.getElementById('calculatorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            calculateROI();
+            saveCalculatorData();
+        });
+        
+        function calculateROI() {
+            // Get form data
+            const businessStructure = document.getElementById('businessStructure').value;
+            const employees = parseInt(document.getElementById('employees').value);
+            const cardVolume = document.getElementById('cardVolume').value;
+            const payrollMethod = document.getElementById('payrollMethod').value;
+            const shipping = document.getElementById('shipping').value;
+            const adminHours = parseInt(document.getElementById('adminHours').value);
+            const hrConfidence = parseInt(document.getElementById('hrConfidence').value);
+            
+            const isCorp = (businessStructure === 'corporation');
+            
+            // Calculate membership
+            const monthlyMembership = RECOVERY_CALCULATOR.CONSTANTS.BASE_MEMBERSHIP + (employees * RECOVERY_CALCULATOR.CONSTANTS.PER_EMPLOYEE);
+            const annualMembership = monthlyMembership * 12;
+            
+            // Initialize savings categories
+            let immediateCash = 0;
+            let avoidedCosts = 0;
+            let timeRecovery = 0;
+            const breakdownItems = [];
+            const opportunities = [];
+            
+            // === IMMEDIATE CASH RECOVERY ===
+            
+            // 1. Merchant Processing (based on volume)
+            if (cardVolume === 'below') {
+                immediateCash += 1500;
+                breakdownItems.push({
+                    label: 'Merchant Processing Fee Reduction (CFIB preferred rates)',
+                    value: 1500,
+                    category: 'immediate'
+                });
+            } else if (cardVolume === 'above') {
+                immediateCash += 3000;
+                breakdownItems.push({
+                    label: 'Merchant Processing Fee Reduction (CFIB preferred rates)',
+                    value: 3000,
+                    category: 'immediate'
+                });
+            }
+            
+            // 2. Payroll Discount (if using service)
+            if (payrollMethod === 'service' && employees > 0) {
+                const payrollSavings = 300;
+                immediateCash += payrollSavings;
+                breakdownItems.push({
+                    label: 'Payroll Service Discount (ADP partnership)',
+                    value: payrollSavings,
+                    category: 'immediate'
+                });
+            }
+            
+            // 3. Shipping Discount
+            if (shipping === 'yes') {
+                const shippingSavings = 800;
+                immediateCash += shippingSavings;
+                breakdownItems.push({
+                    label: 'Shipping Discount (FedEx/Purolator preferred rates)',
+                    value: shippingSavings,
+                    category: 'immediate'
+                });
+            }
+            
+            // 4. Fuel & Fleet Savings (if employees > 2)
+            if (employees >= 2) {
+                const fuelSavings = 400;
+                immediateCash += fuelSavings;
+                breakdownItems.push({
+                    label: 'Fuel & Fleet Savings (Esso/Shell rebates)',
+                    value: fuelSavings,
+                    category: 'immediate'
+                });
+            }
+            
+            // === ADVOCACY-BASED SAVINGS (if incorporated) ===
+            if (isCorp) {
+                // 5. EHT exemption
+                if (employees > 0) {
+                    const ehtSavings = Math.min(employees * 300, 1200);
+                    avoidedCosts += ehtSavings;
+                    breakdownItems.push({
+                        label: 'Employer Health Tax Exemption (CFIB advocacy win)',
+                        value: ehtSavings,
+                        category: 'advocacy'
+                    });
+                }
+                
+                // 6. Small Business Deduction protection
+                const sbdProtection = 2200;
+                avoidedCosts += sbdProtection;
+                breakdownItems.push({
+                    label: 'Small Business Deduction Protection (tax savings)',
+                    value: sbdProtection,
+                    category: 'advocacy'
+                });
+                
+                // 7. CPP/EI reduction wins
+                if (employees > 0) {
+                    const cppEISavings = employees * 180;
+                    avoidedCosts += cppEISavings;
+                    breakdownItems.push({
+                        label: 'CPP/EI Rate Reduction Wins (per employee)',
+                        value: cppEISavings,
+                        category: 'advocacy'
+                    });
+                }
+            } else {
+                // Not incorporated - show opportunity cost
+                opportunities.push({
+                    message: '⚠️ As a non-incorporated business, you're missing out on ~$2,200/year in Small Business Deduction benefits.',
+                    value: 2200
+                });
+                
+                if (employees > 0) {
+                    opportunities.push({
+                        message: `⚠️ You're also missing the Employer Health Tax exemption worth ~$${Math.min(employees * 300, 1200)}/year.`,
+                        value: Math.min(employees * 300, 1200)
+                    });
+                }
+            }
+            
+            // 8. Insurance rebates (if employees >= 3)
+            if (employees >= 3) {
+                const insuranceSavings = 600;
+                immediateCash += insuranceSavings;
+                breakdownItems.push({
+                    label: 'Group Insurance Rebate (CFIB partnerships)',
+                    value: insuranceSavings,
+                    category: 'immediate'
+                });
+            }
+            
+            // 9. Property Tax Appeals (commercial property assumed)
+            const propertyTaxSavings = 800;
+            avoidedCosts += propertyTaxSavings;
+            breakdownItems.push({
+                label: 'Property Tax Appeal Support & Savings',
+                value: propertyTaxSavings,
+                category: 'advocacy'
+            });
+            
+            // 10. Legal Hotline Value (if legal events occurred)
+            const legalCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            const legalEventsCount = legalCheckboxes.length;
+            if (legalEventsCount > 0) {
+                const legalSavings = legalEventsCount * 400;
+                avoidedCosts += legalSavings;
+                breakdownItems.push({
+                    label: `Legal Hotline Usage (${legalEventsCount} consultation${legalEventsCount > 1 ? 's' : ''} saved)`,
+                    value: legalSavings,
+                    category: 'avoided'
+                });
+            }
+            
+            // 11. HR Risk Protection (low confidence)
+            if (hrConfidence <= 5) {
+                const hrProtection = 1400;
+                avoidedCosts += hrProtection;
+                breakdownItems.push({
+                    label: 'HR Document Library & Compliance Protection',
+                    value: hrProtection,
+                    category: 'avoided'
+                });
+            }
+            
+            // === TIME RECOVERY ===
+            const hoursPerYear = adminHours * 52;
+            timeRecovery = Math.round(hoursPerYear * RECOVERY_CALCULATOR.CONSTANTS.OWNER_TIME_VALUE);
+            
+            // === FINAL CALCULATIONS ===
+            const totalSavings = immediateCash + avoidedCosts;
+            
+            // Tax deduction calculation (30% bracket)
+            const taxSavings = Math.round(annualMembership * 0.30);
+            const afterTaxCost = annualMembership - taxSavings;
+            
+            const netBenefit = totalSavings - afterTaxCost;
+            const roiRatio = (totalSavings / afterTaxCost).toFixed(1);
+            
+            // Store results globally
+            calculationResults = {
+                totalSavings,
+                immediateCash,
+                avoidedCosts,
+                timeRecovery,
+                hoursPerYear,
+                monthlyMembership,
+                annualMembership,
+                taxSavings,
+                afterTaxCost,
+                netBenefit,
+                roiRatio,
+                breakdownItems,
+                opportunities,
+                businessStructure,
+                isCorp
+            };
+            
+            // === DISPLAY RESULTS ===
+            displayResults(calculationResults);
+        }
+        
+        function displayResults(data) {
+            document.getElementById('totalSavings').textContent = '$' + data.totalSavings.toLocaleString();
+            document.getElementById('membershipCost').textContent = '$' + data.monthlyMembership + '/month';
+            document.getElementById('annualCost').textContent = '($' + data.annualMembership.toLocaleString() + '/year)';
+            
+            // Tax breakdown
+            document.getElementById('taxBreakdown').innerHTML = `
+                <div class="tax-breakdown-line">
+                    <span>Annual Membership:</span>
+                    <span>$${data.annualMembership.toLocaleString()}</span>
+                </div>
+                <div class="tax-breakdown-line">
+                    <span>Tax Deduction (30% bracket):</span>
+                    <span style="color: #20AA3F;">-$${data.taxSavings.toLocaleString()}</span>
+                </div>
+                <div class="tax-breakdown-line">
+                    <span>Actual After-Tax Cost:</span>
+                    <span>~$${data.afterTaxCost.toLocaleString()}/year</span>
+                </div>
+            `;
+            
+            document.getElementById('netBenefit').textContent = data.netBenefit.toLocaleString();
+            document.getElementById('roiSummary').textContent = 
+                `You're $${data.netBenefit.toLocaleString()} ahead in year one (${data.roiRatio}x return on after-tax cost)`;
+            
+            // Build breakdown by category
+            const immediateItems = data.breakdownItems.filter(i => i.category === 'immediate');
+            const advocacyItems = data.breakdownItems.filter(i => i.category === 'advocacy');
+            const avoidedItems = data.breakdownItems.filter(i => i.category === 'avoided');
+            
+            let breakdownHTML = '';
+            
+            if (immediateItems.length > 0) {
+                breakdownHTML += '<div style="margin-bottom: 20px;"><strong style="color: #20AA3F; font-size: 16px; display: block; margin-bottom: 10px;">💰 Immediate Operational Savings</strong>';
+                immediateItems.forEach(item => {
+                    breakdownHTML += `
+                        <div class="breakdown-item">
+                            <div class="label">${item.label}</div>
+                            <div class="value">$${item.value.toLocaleString()}</div>
+                        </div>
+                    `;
+                });
+                breakdownHTML += '</div>';
+            }
+            
+            if (advocacyItems.length > 0) {
+                breakdownHTML += '<div style="margin-bottom: 20px;"><strong style="color: #D31145; font-size: 16px; display: block; margin-bottom: 10px;">🏛️ Advocacy & Legislative Wins</strong>';
+                advocacyItems.forEach(item => {
+                    breakdownHTML += `
+                        <div class="breakdown-item">
+                            <div class="label">${item.label}</div>
+                            <div class="value">$${item.value.toLocaleString()}</div>
+                        </div>
+                    `;
+                });
+                breakdownHTML += '</div>';
+            }
+            
+            if (avoidedItems.length > 0) {
+                breakdownHTML += '<div style="margin-bottom: 20px;"><strong style="color: #f39200; font-size: 16px; display: block; margin-bottom: 10px;">🛡️ Avoided Professional Costs</strong>';
+                avoidedItems.forEach(item => {
+                    breakdownHTML += `
+                        <div class="breakdown-item">
+                            <div class="label">${item.label}</div>
+                            <div class="value">$${item.value.toLocaleString()}</div>
+                        </div>
+                    `;
+                });
+                breakdownHTML += '</div>';
+            }
+            
+            // Add opportunities section if not incorporated
+            if (data.opportunities.length > 0) {
+                breakdownHTML += '<div style="background: #fff3cd; padding: 20px; border-radius: 8px; border-left: 4px solid #f39200; margin-top: 20px;"><strong style="color: #856404; font-size: 16px; display: block; margin-bottom: 15px;">⚠️ Money You\'re Leaving on the Table</strong>';
+                data.opportunities.forEach(opp => {
+                    breakdownHTML += `<div style="color: #856404; font-size: 15px; margin-bottom: 10px; line-height: 1.5;">${opp.message}</div>`;
+                });
+                breakdownHTML += '<div style="margin-top: 15px; font-size: 14px; color: #856404;"><strong>💡 Want to explore incorporation?</strong> A CFIB Business Advisor can walk you through the pros/cons in 15 minutes — no charge.</div></div>';
+            }
+            
+            // Add tax deductibility note at the end of breakdown
+            breakdownHTML += `
+                <div style="background: linear-gradient(135deg, rgba(32, 170, 63, 0.1) 0%, rgba(37, 75, 135, 0.1) 100%); padding: 20px; border-radius: 8px; margin-top: 25px; border-left: 4px solid #20AA3F;">
+                    <div style="font-size: 15px; color: #333; line-height: 1.6;">
+                        <strong style="color: #254B87; display: block; margin-bottom: 8px;">💰 Tax Deductibility Note:</strong>
+                        As a registered non-profit, CFIB memberships are 100% tax-deductible business expenses. For a business in the 30% tax bracket, your $${data.annualMembership.toLocaleString()} annual membership effectively costs just <strong style="color: #20AA3F;">$${data.afterTaxCost.toLocaleString()}</strong> after tax savings.
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('breakdownList').innerHTML = breakdownHTML;
+            
+            // Time recovery
+            document.getElementById('timeRecovery').innerHTML = `
+                <div class="breakdown-item">
+                    <div class="label">Administrative hours you spend per year</div>
+                    <div class="value">${data.hoursPerYear} hours</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="label">Value of that time @ $${RECOVERY_CALCULATOR.CONSTANTS.OWNER_TIME_VALUE}/hour</div>
+                    <div class="value">$${data.timeRecovery.toLocaleString()}</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="label">What those hours could be worth if reinvested</div>
+                    <div class="value" style="font-size: 14px; text-align: right; line-height: 1.4;">
+                        Sales calls, strategic planning, family time
+                    </div>
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background: rgba(32,170,63,0.1); border-radius: 8px;">
+                    <strong style="color: #20AA3F; display: block; margin-bottom: 8px;">Time Recovery Potential:</strong>
+                    <div style="color: #333; font-size: 15px;">By offloading compliance, HR, and admin to CFIB resources, you could reclaim ${data.hoursPerYear} hours annually — time worth <strong>$${data.timeRecovery.toLocaleString()}</strong> if redirected to revenue-generating activities.</div>
+                </div>
+            `;
+            
+            // Show results
+            document.getElementById('results').classList.add('show');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        function downloadPDF() {
+            if (!calculationResults) {
+                alert('Please calculate your results first');
+                return;
+            }
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Get business data
+            const businessName = document.getElementById('businessName').value || 'Your Business';
+            const cityLocation = document.getElementById('cityLocation').value || 'Durham Region';
+            const painPoint = localStorage.getItem('cfib_pain_point') || 'Not Selected';
+            const industrySelect = document.getElementById('industry').value;
+            const industry = industrySelect === 'other' 
+                ? document.getElementById('industryOther').value 
+                : industrySelect.replace(/_/g, ' ');
+            
+            // Get legal events
+            const legalCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            const legalEvents = Array.from(legalCheckboxes).map(cb => {
+                const labels = {
+                    'employment_changes': 'Employment Changes (hire/termination)',
+                    'policy_updates': 'Policy Updates (handbook/H&S)',
+                    'contract_reviews': 'Contract Reviews (lease/partnership/vendor)',
+                    'general_advice': 'General Legal/HR Advice'
+                };
+                return labels[cb.value] || cb.value;
+            });
+            
+            const data = calculationResults;
+            
+            // Colors
+            const cfibRed = [211, 17, 69];
+            const cfibBlue = [37, 75, 135];
+            const cfibGreen = [32, 170, 63];
+            
+            let yPos = 20;
+            
+            // Header
+            doc.setFillColor(...cfibRed);
+            doc.rect(0, 0, 210, 40, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(22);
+            doc.setFont(undefined, 'bold');
+            doc.text('CFIB DURHAM', 105, 18, { align: 'center' });
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'normal');
+            doc.text('Business Recovery Analysis', 105, 28, { align: 'center' });
+            
+            yPos = 50;
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(16);
+            doc.setFont(undefined, 'bold');
+            doc.text(businessName + ' | ' + cityLocation, 20, yPos);
+            
+            yPos += 8;
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text('Date: ' + new Date().toLocaleDateString(), 20, yPos);
+            
+            // Divider
+            yPos += 8;
+            doc.setDrawColor(...cfibBlue);
+            doc.setLineWidth(0.5);
+            doc.line(20, yPos, 190, yPos);
+            
+            // Business Profile
+            yPos += 10;
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(...cfibBlue);
+            doc.text('BUSINESS PROFILE', 20, yPos);
+            
+            yPos += 7;
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(0, 0, 0);
+            doc.text('Structure: ' + data.businessStructure.replace(/_/g, ' '), 25, yPos);
+            yPos += 6;
+            doc.text('Employees: ' + document.getElementById('employees').value, 25, yPos);
+            yPos += 6;
+            doc.text('Industry: ' + industry, 25, yPos);
+            yPos += 6;
+            doc.text('Primary Pain Point: ' + painPoint, 25, yPos);
+            
+            // Financial Summary
+            yPos += 12;
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(...cfibBlue);
+            doc.text('FINANCIAL SUMMARY', 20, yPos);
+            
+            yPos += 7;
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(0, 0, 0);
+            doc.text('Total Annual Savings: $' + data.totalSavings.toLocaleString(), 25, yPos);
+            yPos += 6;
+            doc.text('Membership Cost: $' + data.annualMembership.toLocaleString() + '/year ($' + data.monthlyMembership + '/month)', 25, yPos);
+            yPos += 6;
+            doc.setTextColor(...cfibGreen);
+            doc.text('Tax Deduction (30%): -$' + data.taxSavings.toLocaleString(), 25, yPos);
+            yPos += 6;
+            doc.setTextColor(0, 0, 0);
+            doc.text('After-Tax Cost: $' + data.afterTaxCost.toLocaleString() + '/year', 25, yPos);
+            yPos += 6;
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(...cfibGreen);
+            doc.text('Net Benefit Year 1: $' + data.netBenefit.toLocaleString(), 25, yPos);
+            
+            // Savings Breakdown
+            yPos += 12;
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(...cfibBlue);
+            doc.text('SAVINGS BREAKDOWN', 20, yPos);
+            
+            // Immediate Savings
+            const immediateItems = data.breakdownItems.filter(i => i.category === 'immediate');
+            if (immediateItems.length > 0) {
+                yPos += 8;
+                doc.setFontSize(10);
+                doc.setTextColor(...cfibGreen);
+                doc.text('Immediate Operational Savings', 25, yPos);
+                doc.setTextColor(0, 0, 0);
+                doc.setFont(undefined, 'normal');
+                immediateItems.forEach(item => {
+                    yPos += 5;
+                    if (yPos > 270) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+                    doc.text('  ' + item.label + ': $' + item.value.toLocaleString(), 25, yPos);
+                });
+            }
+            
+            // Advocacy Wins
+            const advocacyItems = data.breakdownItems.filter(i => i.category === 'advocacy');
+            if (advocacyItems.length > 0) {
+                yPos += 8;
+                if (yPos > 270) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(...cfibRed);
+                doc.text('Advocacy & Legislative Wins', 25, yPos);
+                doc.setTextColor(0, 0, 0);
+                doc.setFont(undefined, 'normal');
+                advocacyItems.forEach(item => {
+                    yPos += 5;
+                    if (yPos > 270) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+                    doc.text('  ' + item.label + ': $' + item.value.toLocaleString(), 25, yPos);
+                });
+            }
+            
+            // Avoided Costs
+            const avoidedItems = data.breakdownItems.filter(i => i.category === 'avoided');
+            if (avoidedItems.length > 0) {
+                yPos += 8;
+                if (yPos > 270) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(243, 146, 0);
+                doc.text('Avoided Professional Costs', 25, yPos);
+                doc.setTextColor(0, 0, 0);
+                doc.setFont(undefined, 'normal');
+                avoidedItems.forEach(item => {
+                    yPos += 5;
+                    if (yPos > 270) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+                    doc.text('  ' + item.label + ': $' + item.value.toLocaleString(), 25, yPos);
+                });
+            }
+            
+            // Time Recovery
+            yPos += 12;
+            if (yPos > 260) {
+                doc.addPage();
+                yPos = 20;
+            }
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(...cfibBlue);
+            doc.text('TIME RECOVERY VALUE', 20, yPos);
+            
+            yPos += 7;
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(0, 0, 0);
+            doc.text('Administrative Hours/Year: ' + data.hoursPerYear + ' hours', 25, yPos);
+            yPos += 6;
+            doc.text('Value @ $65/hour: $' + data.timeRecovery.toLocaleString(), 25, yPos);
+            yPos += 6;
+            doc.text('Potential to redirect to revenue-generating work', 25, yPos);
+            
+            // Legal Health Check
+            if (legalEvents.length > 0) {
+                yPos += 12;
+                if (yPos > 260) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(...cfibBlue);
+                doc.text('LEGAL HEALTH CHECK', 20, yPos);
+                
+                yPos += 7;
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'normal');
+                doc.setTextColor(0, 0, 0);
+                doc.text('Recent events in last 3 years:', 25, yPos);
+                legalEvents.forEach(event => {
+                    yPos += 5;
+                    if (yPos > 270) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+                    doc.text('  ' + event, 25, yPos);
+                });
+            }
+            
+            // Footer
+            yPos += 15;
+            if (yPos > 260) {
+                doc.addPage();
+                yPos = 20;
+            }
+            doc.setDrawColor(...cfibBlue);
+            doc.line(20, yPos, 190, yPos);
+            
+            yPos += 8;
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(...cfibBlue);
+            doc.text('Next Steps: Schedule your recovery call', 105, yPos, { align: 'center' });
+            yPos += 6;
+            doc.setFont(undefined, 'normal');
+            doc.text('Email: jason@cfib-durham.ca', 105, yPos, { align: 'center' });
+            
+            yPos += 10;
+            doc.setFontSize(9);
+            doc.setTextColor(100, 100, 100);
+            doc.text('CFIB Durham | Supporting Durham\'s independent business community', 105, yPos, { align: 'center' });
+            
+            // Save PDF
+            doc.save('CFIB-Recovery-Analysis-' + businessName.replace(/\s+/g, '-') + '.pdf');
+        }
+        
+        function saveCalculatorData() {
+            // Get industry value (use custom if "other" selected)
+            const industrySelect = document.getElementById('industry').value;
+            const industryValue = industrySelect === 'other' 
+                ? document.getElementById('industryOther').value 
+                : industrySelect;
+            
+            // Get legal events
+            const legalCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            const legalEventsArray = Array.from(legalCheckboxes).map(cb => {
+                const labels = {
+                    'employment_changes': 'Employment Changes (hire/termination)',
+                    'policy_updates': 'Policy Updates (handbook/H&S)',
+                    'contract_reviews': 'Contract Reviews (lease/partnership/vendor)',
+                    'general_advice': 'General Legal/HR Advice'
+                };
+                return labels[cb.value] || cb.value;
+            });
+            
+            // Get pain point from localStorage
+            const painPoint = localStorage.getItem('cfib_pain_point') || 'Not Selected';
+            
+            // Save the current calculator state to localStorage for Protection Plan
+            const calcData = {
+                businessName: document.getElementById('businessName').value,
+                cityLocation: document.getElementById('cityLocation').value,
+                painPoint: painPoint,
+                businessStructure: document.getElementById('businessStructure').value,
+                employees: parseInt(document.getElementById('employees').value),
+                industry: industryValue,
+                cardVolume: document.getElementById('cardVolume').value,
+                payrollMethod: document.getElementById('payrollMethod').value,
+                shipping: document.getElementById('shipping').value,
+                adminHours: parseInt(document.getElementById('adminHours').value),
+                hrConfidence: parseInt(document.getElementById('hrConfidence').value),
+                legalEvents: legalEventsArray,
+                timestamp: Date.now()
+            };
+            
+            localStorage.setItem('cfib_calculator_data', JSON.stringify(calcData));
+            
+            // Also save to backend tracking
+            saveToBackend(calcData);
+        }
+        
+        function toggleOtherIndustry() {
+            const industrySelect = document.getElementById('industry');
+            const otherField = document.getElementById('otherIndustryField');
+            const otherInput = document.getElementById('industryOther');
+            
+            if (industrySelect.value === 'other') {
+                otherField.style.display = 'block';
+                otherInput.required = true;
+            } else {
+                otherField.style.display = 'none';
+                otherInput.required = false;
+                otherInput.value = '';
+            }
+        }
+        
+        function saveToBackend(data) {
+            // Create a detailed summary for tracking
+            const summary = {
+                ...data,
+                calculatedAt: new Date(data.timestamp).toLocaleString(),
+                // Add calculated values
+                monthlyMembership: 34 + (data.employees * 3),
+                annualMembership: (34 + (data.employees * 3)) * 12
+            };
+            
+            // Option 2: For now, save to localStorage with all submissions
+            const allSubmissions = JSON.parse(localStorage.getItem('cfib_all_submissions') || '[]');
+            allSubmissions.push(summary);
+            localStorage.setItem('cfib_all_submissions', JSON.stringify(allSubmissions));
+            
+            // Log to console so you can see the data format
+            console.log('Calculator submission saved:', summary);
+        }
+    </script>
+</body>
+</html>
