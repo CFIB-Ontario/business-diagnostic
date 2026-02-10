@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Business Recovery Plan | CFIB Durham</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Montserrat', sans-serif; background-color: #f4f7f9; min-height: 100vh; padding: 20px; }
@@ -252,7 +251,7 @@
                 ? `You're not in crisis, but you're at risk. The Recovery Plan above closes your gaps and moves you to ${projectedScore}/100. The membership pays for itself in under 3 months. Should we activate your profile this week?`
                 : `Even with a strong score of ${result.score}/100, we've found opportunities to optimize to ${projectedScore}/100. Let's lock in these protections and savings. Ready to activate?`;
             
-            html += `<div class="next-steps"><h3>The Brutally Honest Next Steps</h3><div class="cta-text">${ctaMessage}</div><div class="cta-buttons"><a href="mailto:jason@cfib-durham.ca?subject=Recovery Plan - Protection Score ${result.score}" class="cta-btn cta-btn-primary">📧 Schedule My Recovery Call</a><button onclick="downloadPDF()" class="cta-btn cta-btn-secondary" style="border: none;">📄 My Results</button><a href="index.html" class="cta-btn cta-btn-secondary">🔄 Start Over</a></div></div>`;
+            html += `<div class="next-steps"><h3>The Brutally Honest Next Steps</h3><div class="cta-text">${ctaMessage}</div><div class="cta-buttons"><a href="mailto:jason@cfib-durham.ca?subject=Recovery Plan - Protection Score ${result.score}" class="cta-btn cta-btn-primary">📧 Schedule My Recovery Call</a><button onclick="emailResults()" class="cta-btn cta-btn-secondary" style="border: none;">📄 My Results</button><a href="index.html" class="cta-btn cta-btn-secondary">🔄 Start Over</a></div></div>`;
             
             document.getElementById('mainContent').innerHTML = html;
             
@@ -266,10 +265,7 @@
             window.netGain = netGain;
         }
         
-        function downloadPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
+        function emailResults() {
             const result = window.currentResult;
             const data = window.currentData;
             const totalRecovery = window.totalRecovery;
@@ -281,215 +277,61 @@
             // Page settings
             const pageWidth = doc.internal.pageSize.width;
             const margin = 20;
-            let y = 20;
             
-            // Header - CFIB Branding
-            doc.setFontSize(24);
-            doc.setTextColor(211, 17, 69); // CFIB Red
-            doc.setFont(undefined, 'bold');
-            doc.text('CFIB Durham Region', margin, y);
-            
-            y += 8;
-            doc.setFontSize(12);
-            doc.setTextColor(100, 100, 100);
-            doc.setFont(undefined, 'normal');
-            doc.text('Business Recovery Plan Summary', margin, y);
-            
-            y += 15;
-            
-            // Business Info
-            doc.setFontSize(14);
-            doc.setTextColor(37, 75, 135); // CFIB Blue
-            doc.setFont(undefined, 'bold');
-            doc.text('Business Information', margin, y);
-            
-            y += 7;
-            doc.setFontSize(10);
-            doc.setTextColor(50, 50, 50);
-            doc.setFont(undefined, 'normal');
-            doc.text(`Business Name: ${data.businessName || 'N/A'}`, margin, y);
-            
-            y += 5;
-            doc.text(`Location: ${data.cityLocation || 'N/A'}`, margin, y);
-            
-            y += 5;
-            doc.text(`Employees: ${data.employees}`, margin, y);
-            
-            y += 5;
-            doc.text(`Industry: ${data.industry || 'N/A'}`, margin, y);
-            
-            y += 12;
-            
-            // Protection Score
-            doc.setFontSize(14);
-            doc.setTextColor(37, 75, 135);
-            doc.setFont(undefined, 'bold');
-            doc.text('Protection Score Assessment', margin, y);
-            
-            y += 7;
-            doc.setFontSize(24);
-            const scoreColor = result.score < 40 ? [211, 17, 69] : result.score < 76 ? [243, 146, 0] : [32, 170, 63];
-            doc.setTextColor(...scoreColor);
-            doc.text(`${result.score}/100`, margin, y);
-            
-            y += 7;
-            doc.setFontSize(10);
-            doc.setTextColor(100, 100, 100);
-            const scoreLabel = result.score < 40 ? 'HIGHLY VULNERABLE' : result.score < 76 ? 'ACTION RECOMMENDED' : 'STRONG COVERAGE';
-            doc.text(scoreLabel, margin, y);
-            
-            y += 12;
-            
-            // Vulnerabilities
-            if (result.vulnerabilities.length > 0) {
-                doc.setFontSize(14);
-                doc.setTextColor(37, 75, 135);
-                doc.setFont(undefined, 'bold');
-                doc.text('Identified Vulnerabilities', margin, y);
-                
-                y += 7;
-                doc.setFontSize(9);
-                doc.setTextColor(50, 50, 50);
-                doc.setFont(undefined, 'normal');
-                
-                result.vulnerabilities.forEach((vuln, index) => {
-                    if (y > 270) { // Check if we need a new page
-                        doc.addPage();
-                        y = 20;
-                    }
-                    
-                    doc.setFont(undefined, 'bold');
-                    doc.text(`${index + 1}. ${vuln.title}`, margin + 3, y);
-                    y += 5;
-                    
-                    doc.setFont(undefined, 'normal');
-                    const impactLines = doc.splitTextToSize(vuln.impact, pageWidth - margin * 2 - 6);
-                    doc.text(impactLines, margin + 6, y);
-                    y += (impactLines.length * 4) + 2;
-                    
-                    doc.setFont(undefined, 'bold');
-                    doc.setTextColor(211, 17, 69);
-                    doc.text(`Cost: ${vuln.cost}`, margin + 6, y);
-                    doc.setTextColor(50, 50, 50);
-                    y += 7;
-                });
-                
-                y += 5;
-            }
-            
-            // Recovery Actions
-            if (y > 200) {
-                doc.addPage();
-                y = 20;
-            }
-            
-            doc.setFontSize(14);
-            doc.setTextColor(37, 75, 135);
-            doc.setFont(undefined, 'bold');
-            doc.text('Recovery Actions', margin, y);
-            
-            y += 7;
-            doc.setFontSize(9);
-            doc.setTextColor(50, 50, 50);
-            doc.setFont(undefined, 'normal');
-            
-            result.recoveryActions.forEach((action, index) => {
-                if (y > 260) {
-                    doc.addPage();
-                    y = 20;
-                }
-                
-                doc.setFont(undefined, 'bold');
-                doc.text(`${index + 1}. ${action.title}`, margin + 3, y);
-                y += 5;
-                
-                doc.setFont(undefined, 'normal');
-                const descLines = doc.splitTextToSize(action.description, pageWidth - margin * 2 - 6);
-                doc.text(descLines, margin + 6, y);
-                y += (descLines.length * 4) + 2;
-                
-                doc.setFont(undefined, 'bold');
-                doc.setTextColor(32, 170, 63);
-                doc.text(`Annual Recovery: $${action.value.toLocaleString()}`, margin + 6, y);
-                doc.setTextColor(50, 50, 50);
-                y += 7;
+            // Build detailed breakdown for email
+            let vulnerabilitiesText = '';
+            result.vulnerabilities.forEach((vuln, index) => {
+                vulnerabilitiesText += `${index + 1}. ${vuln.title}\n`;
+                vulnerabilitiesText += `   Impact: ${vuln.impact}\n`;
+                vulnerabilitiesText += `   Cost: ${vuln.cost}\n\n`;
             });
             
-            y += 5;
+            let recoveryActionsText = '';
+            result.recoveryActions.forEach((action, index) => {
+                recoveryActionsText += `${index + 1}. ${action.title}\n`;
+                recoveryActionsText += `   Description: ${action.description}\n`;
+                recoveryActionsText += `   Benefit: ${action.benefit}\n`;
+                recoveryActionsText += `   Value: $${action.value.toLocaleString()}/year\n\n`;
+            });
             
-            // Financial Summary
-            if (y > 220) {
-                doc.addPage();
-                y = 20;
-            }
+            // Prepare form data for Formspree
+            const formData = {
+                businessName: data.businessName || 'N/A',
+                cityLocation: data.cityLocation || 'N/A',
+                employees: data.employees || 0,
+                industry: data.industry || 'N/A',
+                businessStructure: data.businessStructure || 'N/A',
+                protectionScore: `${result.score}/100`,
+                totalRecovery: `$${totalRecovery.toLocaleString()}`,
+                membershipCost: `$${membershipCost.toLocaleString()}/year`,
+                taxDeduction: `$${taxSavings.toLocaleString()}`,
+                afterTaxCost: `$${afterTaxCost.toLocaleString()}/year`,
+                netAnnualGain: `$${netGain.toLocaleString()}`,
+                vulnerabilities: vulnerabilitiesText,
+                recoveryActions: recoveryActionsText,
+                timestamp: new Date().toLocaleString()
+            };
             
-            doc.setFontSize(14);
-            doc.setTextColor(37, 75, 135);
-            doc.setFont(undefined, 'bold');
-            doc.text('Financial Summary', margin, y);
-            
-            y += 10;
-            doc.setFontSize(10);
-            doc.setTextColor(50, 50, 50);
-            doc.setFont(undefined, 'normal');
-            
-            doc.text('Total Annual Recovery:', margin, y);
-            doc.setFont(undefined, 'bold');
-            doc.setTextColor(32, 170, 63);
-            doc.text(`$${totalRecovery.toLocaleString()}`, pageWidth - margin - 40, y);
-            
-            y += 7;
-            doc.setFont(undefined, 'normal');
-            doc.setTextColor(50, 50, 50);
-            doc.text('Membership Investment:', margin, y);
-            doc.setFont(undefined, 'bold');
-            doc.text(`$${membershipCost.toLocaleString()}/year`, pageWidth - margin - 40, y);
-            
-            y += 7;
-            doc.setFont(undefined, 'normal');
-            doc.text('Tax Deduction (30% bracket):', margin, y);
-            doc.setFont(undefined, 'bold');
-            doc.setTextColor(32, 170, 63);
-            doc.text(`-$${taxSavings.toLocaleString()}`, pageWidth - margin - 40, y);
-            
-            y += 7;
-            doc.setFont(undefined, 'normal');
-            doc.setTextColor(50, 50, 50);
-            doc.text('After-Tax Cost:', margin, y);
-            doc.setFont(undefined, 'bold');
-            doc.text(`$${afterTaxCost.toLocaleString()}/year`, pageWidth - margin - 40, y);
-            
-            y += 10;
-            // Draw line
-            doc.setDrawColor(200, 200, 200);
-            doc.line(margin, y, pageWidth - margin, y);
-            
-            y += 7;
-            doc.setFontSize(12);
-            doc.setFont(undefined, 'bold');
-            doc.text('Net Annual Gain:', margin, y);
-            doc.setTextColor(32, 170, 63);
-            doc.setFontSize(14);
-            doc.text(`$${netGain.toLocaleString()}`, pageWidth - margin - 40, y);
-            
-            y += 15;
-            
-            // Footer
-            doc.setFontSize(8);
-            doc.setTextColor(100, 100, 100);
-            doc.setFont(undefined, 'italic');
-            const footerText = 'As a registered non-profit, CFIB memberships are 100% tax-deductible business expenses.';
-            const footerLines = doc.splitTextToSize(footerText, pageWidth - margin * 2);
-            doc.text(footerLines, margin, y);
-            
-            y += 10;
-            doc.setFont(undefined, 'normal');
-            doc.text('Generated by CFIB Durham Region Business Diagnostic Tool', margin, y);
-            doc.text(new Date().toLocaleDateString(), pageWidth - margin - 30, y);
-            
-            // Save PDF
-            const fileName = `CFIB-Recovery-Plan-${data.businessName ? data.businessName.replace(/[^a-z0-9]/gi, '_') : 'Business'}.pdf`;
-            doc.save(fileName);
+            // Submit to Formspree (sends to jasoncfib@gmail.com)
+            fetch('https://formspree.io/f/mvzbzger', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('✅ Results sent to CFIB Durham!\n\nWe\'ll email you a detailed breakdown within 24 hours.\n\nThank you for using the Business Diagnostic Tool!');
+                } else {
+                    alert('⚠️ There was an issue sending your results.\n\nPlease contact jason@cfib-durham.ca directly or try the "Schedule My Recovery Call" button above.');
+                }
+            })
+            .catch(error => {
+                alert('⚠️ There was an issue sending your results.\n\nPlease contact jason@cfib-durham.ca directly or try the "Schedule My Recovery Call" button above.');
+                console.error('Error:', error);
+            });
+        }
         }
     </script>
 </body>
