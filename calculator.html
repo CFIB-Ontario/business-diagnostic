@@ -450,6 +450,7 @@
                         <option value="hospitality">Hospitality/Restaurant</option>
                         <option value="service">Professional Services</option>
                         <option value="construction">Manufacturing/Trades/Construction</option>
+                        <option value="automotive">Automotive</option>
                         <option value="other">Other</option>
                     </select>
                 </div>
@@ -895,7 +896,7 @@
                                     ${item.label}
                                     ${tooltipText ? `<span class="tooltip-icon" onclick="toggleTooltip(this)">?</span><div class="tooltip-text">${tooltipText}</div>` : ''}
                                 </div>
-                                <div class="value">$${item.value.toLocaleString()}</div>
+                                <div class="value">approx. $${item.value.toLocaleString()}</div>
                             </div>
                         </div>
                     `;
@@ -919,7 +920,7 @@
                                     ${item.label}
                                     ${tooltipText ? `<span class="tooltip-icon" onclick="toggleTooltip(this)">?</span><div class="tooltip-text">${tooltipText}</div>` : ''}
                                 </div>
-                                <div class="value">$${item.value.toLocaleString()}</div>
+                                <div class="value">approx. $${item.value.toLocaleString()}</div>
                             </div>
                         </div>
                     `;
@@ -941,7 +942,7 @@
                                     ${item.label}
                                     ${tooltipText ? `<span class="tooltip-icon" onclick="toggleTooltip(this)">?</span><div class="tooltip-text">${tooltipText}</div>` : ''}
                                 </div>
-                                <div class="value">$${item.value.toLocaleString()}</div>
+                                <div class="value">potential $${item.value.toLocaleString()}</div>
                             </div>
                         </div>
                     `;
