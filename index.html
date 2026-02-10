@@ -326,6 +326,9 @@
                 detailsList.innerHTML = data.questions.map(q => `<li>${q}</li>`).join('');
                 detailsContainer.classList.add('show');
                 
+                // Save the selected pain point to localStorage
+                localStorage.setItem('cfib_pain_point', category);
+                
                 setTimeout(() => {
                     detailsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }, 300);

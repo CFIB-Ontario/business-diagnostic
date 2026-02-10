@@ -1002,10 +1002,14 @@
                 advice: document.getElementById('event4').checked
             };
             
+            // Get pain point from index.html selection
+            const painPoint = localStorage.getItem('cfib_pain_point') || 'Not selected';
+            
             // Save the current calculator state to localStorage for Protection Plan
             const calcData = {
                 businessName: document.getElementById('businessName').value,
                 cityLocation: document.getElementById('cityLocation').value,
+                painPoint: painPoint,
                 businessStructure: document.getElementById('businessStructure').value,
                 employees: parseInt(document.getElementById('employees').value),
                 industry: industryValue,
@@ -1014,7 +1018,7 @@
                 shipping: document.getElementById('shipping').value,
                 adminHours: parseInt(document.getElementById('adminHours').value),
                 hrConfidence: parseInt(document.getElementById('hrConfidence').value),
-                legalEvents: document.querySelectorAll('input[type="checkbox"]:checked').length,
+                legalEvents: document.querySelectorAll('#event1:checked, #event2:checked, #event3:checked, #event4:checked').length,
                 legalEventDetails: legalEventDetails,
                 timestamp: Date.now()
             };
