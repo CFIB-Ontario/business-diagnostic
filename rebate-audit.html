@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rebate Eligibility Audit | CFIB Durham</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Montserrat', sans-serif; background-color: #f4f7f9; min-height: 100vh; padding: 20px; }
+        
+        .header {
+            text-align: center;
+            padding: 20px 0 30px 0;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .header h1 {
+            color: #D31145;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #656465;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        
+        .back-link {
+            display: inline-block;
+            color: #254B87;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .back-link:hover {
+            color: #D31145;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .audit-section {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .audit-section h2 {
+            color: #254B87;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .checklist-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border-left: 4px solid #656465;
+        }
+        
+        .checklist-item.answered-yes {
+            border-left-color: #20AA3F;
+            background: #f0f8f3;
+        }
+        
+        .checklist-item.answered-no {
+            border-left-color: #D31145;
+            background: #fff5f7;
+        }
+        
+        .checklist-item .question {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .choice-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #656465;
+            background: white;
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .choice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .choice-btn.selected-yes {
+            background: #20AA3F;
+            color: white;
+            border-color: #20AA3F;
+        }
+        
+        .choice-btn.selected-no {
+            background: #D31145;
+            color: white;
+            border-color: #D31145;
+        }
+        
+        .choice-btn.selected-unsure {
+            background: #f39200;
+            color: white;
+            border-color: #f39200;
+        }
+        
+        .results-section {
+            display: none;
+            background: linear-gradient(135deg, #254B87 0%, #D31145 100%);
+            color: white;
+            padding: 50px 40px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        
+        .results-section.show {
+            display: block;
+        }
+        
+        .results-section h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+            color: white;
+        }
+        
+        .result-card {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .result-card h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .result-card .status {
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .result-card .amount {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 15px 0;
+        }
+        
+        .script-box {
+            background: rgba(255,255,255,0.25);
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border-left: 5px solid white;
+        }
+        
+        .script-box h4 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        
+        .script-box p {
+            font-size: 16px;
+            line-height: 1.7;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+        
+        .script-box .nepq-question {
+            background: rgba(32,170,63,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: 600;
+            font-style: normal;
+        }
+        
+        .action-items {
+            background: rgba(32,170,63,0.2);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .action-items h5 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .action-items ul {
+            margin-left: 20px;
+        }
+        
+        .action-items li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        
+        .cta-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .cta-btn {
+            display: inline-block;
+            background: #20AA3F;
+            color: white;
+            padding: 18px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 18px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(32,170,63,0.3);
+        }
+        
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(32,170,63,0.4);
+        }
+        
+        .reset-btn {
+            display: inline-block;
+            background: white;
+            color: #254B87;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            margin-left: 15px;
+            transition: all 0.3s;
+            border: 2px solid #254B87;
+        }
+        
+        .reset-btn:hover {
+            background: #254B87;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 { font-size: 24px; }
+            .audit-section { padding: 25px; }
+            .results-section { padding: 30px 25px; }
+            .button-group { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="index.html" class="back-link">← Back to Main Page</a>
+        <h1>Rebate Eligibility Audit</h1>
+        <p>Diagnose why they didn't get their money - and how to fix it</p>
+    </div>
+    
+    <div class="container">
+        <!-- Carbon Rebate Checklist -->
+        <div class="audit-section">
+            <h2>🇨🇦 Carbon Rebate Eligibility (Small Business)</h2>
+            
+            <div class="checklist-item" id="carbon-q1">
+                <div class="question">1. Is the business incorporated as a CCPC (Canadian Controlled Private Corporation)?</div>
+                <div class="button-group">
+                    <button class="choice-btn" onclick="answer('carbon', 1, 'yes')">✅ Yes</button>
+                    <button class="choice-btn" onclick="answer('carbon', 1, 'no')">❌ No</button>
+                </div>
+            </div>
+            
+            <div class="checklist-item" id="carbon-q2">
+                <div class="question">2. Does the business have 1-499 employees with T4s issued?</div>
+                <div class="button-group">
+                    <button class="choice-btn" onclick="answer('carbon', 2, 'yes')">✅ Yes</button>
+                    <button class="choice-btn" onclick="answer('carbon', 2, 'no')">❌ No</button>
+                </div>
+            </div>
+            
+            <div class="checklist-item" id="carbon-q3">
+                <div class="question">3. Was the 2023 T4 Summary filed by July 15, 2024?</div>
+                <div class="button-group">
+                    <button class="choice-btn" onclick="answer('carbon', 3, 'yes')">✅ Yes</button>
+                    <button class="choice-btn" onclick="answer('carbon', 3, 'no')">❌ No</button>
+                    <button class="choice-btn" onclick="answer('carbon', 3, 'unsure')">🤷 Not Sure</button>
+                </div>
+            </div>
+            
+            <div class="checklist-item" id="carbon-q4">
+                <div class="question">4. Is the business located in Ontario (or another fuel-charge province)?</div>
+                <div class="button-group">
+                    <button class="choice-btn" onclick="answer('carbon', 4, 'yes')">✅ Yes</button>
+                    <button class="choice-btn" onclick="answer('carbon', 4, 'no')">❌ No</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- WSIB Surplus Checklist -->
+        <div class="audit-section">
+            <h2>🏥 WSIB Surplus Distribution Eligibility</h2>
+            
+            <div class="checklist-item" id="wsib-q1">
+                <div class="question">1. Does the business have an active WSIB account?</div>
+                <div class="button-group">
+                    <button class="choice-btn" onclick="answer('wsib', 1, 'yes')">✅ Yes</button>
+                    <button class="choice-btn" onclick="answer('wsib', 1, 'no')">❌ No</button>
+                </div>
+            </div>
+            
+            <div class="checklist-item" id="wsib-q2">
+                <div class="question">2. Is the business up to date with WSIB premium payments?</div>
+                <div class="button-group">
+                    <button class="choice-btn" onclick="answer('wsib', 2, 'yes')">✅ Yes</button>
+                    <button class="choice-btn" onclick="answer('wsib', 2, 'no')">❌ No</button>
+                    <button class="choice-btn" onclick="answer('wsib', 2, 'unsure')">🤷 Not Sure</button>
+                </div>
+            </div>
+            
+            <div class="checklist-item" id="wsib-q3">
+                <div class="question">3. Is the business located in Ontario?</div>
+                <div class="button-group">
+                    <button class="choice-btn" onclick="answer('wsib', 3, 'yes')">✅ Yes</button>
+                    <button class="choice-btn" onclick="answer('wsib', 3, 'no')">❌ No</button>
+                </div>
+            </div>
+            
+            <div class="checklist-item" id="wsib-q4">
+                <div class="question">4. Is the business in good standing with no major safety violations?</div>
+                <div class="button-group">
+                    <button class="choice-btn" onclick="answer('wsib', 4, 'yes')">✅ Yes</button>
+                    <button class="choice-btn" onclick="answer('wsib', 4, 'no')">❌ No</button>
+                    <button class="choice-btn" onclick="answer('wsib', 4, 'unsure')">🤷 Not Sure</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Results Section -->
+        <div class="results-section" id="results">
+            <h2>🔍 Audit Results & Action Plan</h2>
+            <div id="resultsContent"></div>
+            
+            <div class="cta-section">
+                <a href="mailto:jason@cfib-durham.ca?subject=Rebate Audit - Need Help" class="cta-btn">📧 Schedule Audit Call</a>
+                <button onclick="resetAudit()" class="reset-btn">🔄 Reset Audit</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const auditData = {
+            carbon: {},
+            wsib: {}
+        };
+        
+        function answer(type, questionNum, value) {
+            // Save answer
+            auditData[type][questionNum] = value;
+            
+            // Update UI
+            const item = document.getElementById(`${type}-q${questionNum}`);
+            const buttons = item.querySelectorAll('.choice-btn');
+            
+            buttons.forEach(btn => {
+                btn.classList.remove('selected-yes', 'selected-no', 'selected-unsure');
+            });
+            
+            const selectedBtn = Array.from(buttons).find(btn => {
+                if (value === 'yes' && btn.textContent.includes('Yes')) return true;
+                if (value === 'no' && btn.textContent.includes('No')) return true;
+                if (value === 'unsure' && btn.textContent.includes('Not Sure')) return true;
+                return false;
+            });
+            
+            if (selectedBtn) {
+                selectedBtn.classList.add(`selected-${value}`);
+            }
+            
+            if (value === 'yes') {
+                item.classList.add('answered-yes');
+                item.classList.remove('answered-no');
+            } else if (value === 'no') {
+                item.classList.add('answered-no');
+                item.classList.remove('answered-yes');
+            } else {
+                item.classList.remove('answered-yes', 'answered-no');
+            }
+            
+            // Check if audit is complete
+            checkAuditComplete();
+        }
+        
+        function checkAuditComplete() {
+            const carbonComplete = Object.keys(auditData.carbon).length === 4;
+            const wsibComplete = Object.keys(auditData.wsib).length === 4;
+            
+            if (carbonComplete && wsibComplete) {
+                generateResults();
+            }
+        }
+        
+        function generateResults() {
+            const resultsDiv = document.getElementById('resultsContent');
+            let html = '';
+            
+            // Analyze Carbon Rebate
+            const carbonResult = analyzeCarbonRebate();
+            html += carbonResult.html;
+            
+            // Analyze WSIB
+            const wsibResult = analyzeWSIB();
+            html += wsibResult.html;
+            
+            resultsDiv.innerHTML = html;
+            document.getElementById('results').classList.add('show');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function analyzeCarbonRebate() {
+            const d = auditData.carbon;
+            
+            // NOT ELIGIBLE - Not Incorporated
+            if (d[1] === 'no') {
+                return {
+                    html: `
+                        <div class="result-card">
+                            <h3>🇨🇦 Carbon Rebate: ❌ NOT ELIGIBLE</h3>
+                            <div class="status">Status: Excluded from program (Sole Proprietor/Partnership)</div>
+                            <div class="amount">Potential Value: $490 - $4,800/year (based on employee count)</div>
+                            
+                            <div class="script-box">
+                                <h4>📋 NEPQ Script - The Pivot</h4>
+                                <p>"I see the gap. The reason the money didn't hit your account is that you're currently operating as a Sole Proprietorship, not a CCPC. In the eyes of the Ministry, you're just an individual, so you're ineligible for this specific small business stream."</p>
+                                <p><strong>[PAUSE - Let it sink in]</strong></p>
+                                <p>"If we don't fix this classification, you aren't just missing this rebate—you're essentially overpaying your personal income tax on every dollar the shop makes, and you're personally liable if anything goes sideways."</p>
+                                <div class="nepq-question">
+                                    💬 "What's the reason you haven't moved to an incorporated model yet? Is it the cost or just the headache of the paperwork?"
+                                </div>
+                            </div>
+                            
+                            <div class="action-items">
+                                <h5>✅ Next Steps:</h5>
+                                <ul>
+                                    <li>CFIB Business Resource (BR) Support can handle incorporation - typically $500-$1,500</li>
+                                    <li>Once incorporated, retroactive filing may be possible for current tax year</li>
+                                    <li>Schedule 30-min incorporation consultation (no charge for CFIB members)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                };
+            }
+            
+            // ELIGIBLE BUT UNCERTAIN
+            if (d[1] === 'yes' && (d[3] === 'unsure' || d[3] === 'no')) {
+                return {
+                    html: `
+                        <div class="result-card">
+                            <h3>🇨🇦 Carbon Rebate: ⚠️ LIKELY ELIGIBLE - FILING GAP</h3>
+                            <div class="status">Status: You qualify but T4 filing may be the issue</div>
+                            <div class="amount">Owed Amount: $490 - $4,800/year (based on employee count)</div>
+                            
+                            <div class="script-box">
+                                <h4>📋 NEPQ Script - Investigation</h4>
+                                <p>"You check all the boxes, which means you SHOULD have received between $490 and $4,800. The fact that you didn't tells me there's a filing gap somewhere—either the T4 deadline was missed, or the business number isn't properly registered with CRA."</p>
+                                <p><strong>[PAUSE]</strong></p>
+                                <div class="nepq-question">
+                                    💬 "When was the last time someone actually audited your CRA filings? Have you been doing your own T4s or trusting a bookkeeper who might not be catching these?"
+                                </div>
+                            </div>
+                            
+                            <div class="action-items">
+                                <h5>✅ Next Steps:</h5>
+                                <ul>
+                                    <li>CFIB BR Support can audit CRA account to identify the gap</li>
+                                    <li>File late T4 summary if missed (penalties may apply but rebate still available)</li>
+                                    <li>Verify business number is registered for carbon rebate program</li>
+                                    <li>Set up compliance calendar to never miss future deadlines</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                };
+            }
+            
+            // FULLY ELIGIBLE
+            if (d[1] === 'yes' && d[2] === 'yes' && d[3] === 'yes' && d[4] === 'yes') {
+                return {
+                    html: `
+                        <div class="result-card">
+                            <h3>🇨🇦 Carbon Rebate: ✅ FULLY ELIGIBLE</h3>
+                            <div class="status">Status: Payment should be automatic (December/January)</div>
+                            <div class="amount">Expected Amount: $490 - $4,800/year (based on employee count)</div>
+                            
+                            <div class="script-box">
+                                <h4>📋 NEPQ Script - Future Protection</h4>
+                                <p>"Good news - you're set up correctly and you should receive your payment. But here's the thing: most owners don't know HOW to stay compliant year after year. One missed T4 deadline and you lose next year's rebate."</p>
+                                <div class="nepq-question">
+                                    💬 "Do you have a system in place to make sure nothing falls through the cracks next filing season, or is it just you hoping you remember everything?"
+                                </div>
+                            </div>
+                            
+                            <div class="action-items">
+                                <h5>✅ Next Steps:</h5>
+                                <ul>
+                                    <li>Payment arrives via direct deposit December-January</li>
+                                    <li>If not received by Jan 31, call CRA Business Enquiries: 1-800-959-5525</li>
+                                    <li>CFIB membership includes ongoing compliance support and deadline reminders</li>
+                                    <li>Set calendar reminder for July 15 T4 deadline each year</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                };
+            }
+            
+            // Default
+            return {
+                html: `<div class="result-card"><h3>🇨🇦 Carbon Rebate: Incomplete Audit</h3><p>Please answer all questions to see results.</p></div>`
+            };
+        }
+        
+        function analyzeWSIB() {
+            const d = auditData.wsib;
+            
+            // NOT ELIGIBLE - No WSIB Account
+            if (d[1] === 'no') {
+                return {
+                    html: `
+                        <div class="result-card">
+                            <h3>🏥 WSIB Surplus: ❌ NOT ELIGIBLE</h3>
+                            <div class="status">Status: No active WSIB account</div>
+                            <div class="amount">Missed Value: $250 - $5,000/year (based on premiums paid)</div>
+                            
+                            <div class="script-box">
+                                <h4>📋 NEPQ Script - Risk Exposure</h4>
+                                <p>"Here's the concern: you don't have WSIB coverage, which means if anyone gets hurt on the job—even a subcontractor—you're personally on the hook for medical costs, lost wages, and potential lawsuits."</p>
+                                <p><strong>[PAUSE]</strong></p>
+                                <div class="nepq-question">
+                                    💬 "Are you comfortable with that level of personal liability, or has it just been easier to skip the WSIB registration?"
+                                </div>
+                            </div>
+                            
+                            <div class="action-items">
+                                <h5>✅ Next Steps:</h5>
+                                <ul>
+                                    <li>Register for WSIB account (mandatory for most Ontario businesses with employees)</li>
+                                    <li>Once registered and compliant, eligible for future surplus distributions</li>
+                                    <li>CFIB BR Support can assist with WSIB registration and classification</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                };
+            }
+            
+            // ELIGIBLE BUT UNCERTAIN
+            if (d[1] === 'yes' && (d[2] === 'unsure' || d[4] === 'unsure')) {
+                return {
+                    html: `
+                        <div class="result-card">
+                            <h3>🏥 WSIB Surplus: ⚠️ LIKELY ELIGIBLE - VERIFICATION NEEDED</h3>
+                            <div class="status">Status: Account exists but compliance unclear</div>
+                            <div class="amount">Potential Amount: $250 - $5,000 (based on premiums paid)</div>
+                            
+                            <div class="script-box">
+                                <h4>📋 NEPQ Script - Audit Discovery</h4>
+                                <p>"You have a WSIB account, which is good. But if you're not sure about your payment status or safety record, there could be flags preventing the surplus payment."</p>
+                                <div class="nepq-question">
+                                    💬 "When was the last time you actually logged into your WSIB account to check? Do you even know if you're classified correctly for your industry?"
+                                </div>
+                            </div>
+                            
+                            <div class="action-items">
+                                <h5>✅ Next Steps:</h5>
+                                <ul>
+                                    <li>Log into WSIB portal to verify payment status and account standing</li>
+                                    <li>Check for any outstanding premiums or safety violations</li>
+                                    <li>CFIB can review WSIB account classification (many businesses overpay due to wrong rate class)</li>
+                                    <li>Surplus payments typically distributed in Q1 of each year</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                };
+            }
+            
+            // FULLY ELIGIBLE
+            if (d[1] === 'yes' && d[2] === 'yes' && d[3] === 'yes' && d[4] === 'yes') {
+                return {
+                    html: `
+                        <div class="result-card">
+                            <h3>🏥 WSIB Surplus: ✅ FULLY ELIGIBLE</h3>
+                            <div class="status">Status: Automatic distribution (March 2026)</div>
+                            <div class="amount">Expected Amount: $250 - $5,000 (based on 2025 premiums paid)</div>
+                            
+                            <div class="script-box">
+                                <h4>📋 NEPQ Script - Optimization</h4>
+                                <p>"You're getting the surplus, which is great. But most business owners don't realize they're overpaying WSIB premiums because they're classified in the wrong rate group."</p>
+                                <div class="nepq-question">
+                                    💬 "Have you ever had anyone actually audit your WSIB classification? You could be paying construction rates when you should be office rates—that's thousands lost every year."
+                                </div>
+                            </div>
+                            
+                            <div class="action-items">
+                                <h5>✅ Next Steps:</h5>
+                                <ul>
+                                    <li>Surplus payment arrives March 2026 (automatic if in good standing)</li>
+                                    <li>If not received by March 31, call WSIB: 1-800-387-0750</li>
+                                    <li>CFIB can audit your rate classification to identify overpayment opportunities</li>
+                                    <li>Set up ongoing WSIB compliance monitoring through CFIB membership</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                };
+            }
+            
+            // Default
+            return {
+                html: `<div class="result-card"><h3>🏥 WSIB Surplus: Incomplete Audit</h3><p>Please answer all questions to see results.</p></div>`
+            };
+        }
+        
+        function resetAudit() {
+            auditData.carbon = {};
+            auditData.wsib = {};
+            
+            document.querySelectorAll('.checklist-item').forEach(item => {
+                item.classList.remove('answered-yes', 'answered-no');
+                item.querySelectorAll('.choice-btn').forEach(btn => {
+                    btn.classList.remove('selected-yes', 'selected-no', 'selected-unsure');
+                });
+            });
+            
+            document.getElementById('results').classList.remove('show');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
