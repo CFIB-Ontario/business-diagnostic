@@ -103,7 +103,7 @@
                 if (data.hrConfidence <= 5 || data.legalEvents === 0) {
                     score -= this.WEIGHTS.HR_LEGAL_GAP;
                     vulnerabilities.push({ icon: '⚖️', title: 'HR/Legal Compliance Gap', impact: 'Outdated or missing employment contracts, handbooks, and policies expose you to Ministry of Labour disputes.', cost: 'Potential $10,000+ liability' });
-                    recoveryActions.push({ icon: '🛡️', title: 'HR Now! Protection Shield', description: 'Deploy CFIB HR Document Library and unlimited Business Advisor access.', benefit: 'Instant access to Ontario-compliant templates and expert advice to stop a $350/hour lawyer bill before it starts. Includes employment contracts, termination letters, health & safety policies.', value: 1400 });
+                    recoveryActions.push({ icon: '🛡️', title: 'HR Now! Protection Shield', description: 'Deploy CFIB HR Document Library and unlimited Business Advisor access.', benefit: 'Instant access to Ontario-compliant templates and expert advice to stop a $300/hour lawyer bill before it starts. Includes employment contracts, termination letters, health & safety policies.', value: 1400 });
                 }
                 
                 if (data.payrollMethod === 'manual' || data.payrollMethod === 'bank') {
@@ -129,8 +129,12 @@
                 
                 if (data.employees > 0) {
                     score -= this.WEIGHTS.ADVOCACY_GAP;
+                    const wsibSurplus = data.employees * 250; // $250 per employee
+                    const carbonRebate = data.employees * 98;
+                    const totalAdvocacyValue = wsibSurplus + carbonRebate;
+                    
                     vulnerabilities.push({ icon: '📢', title: 'Advocacy Gap', impact: 'Fighting tax hikes, WSIB increases, and regulatory changes alone without 100,000 voices backing you.', cost: 'Unquantified risk' });
-                    recoveryActions.push({ icon: '🏛️', title: 'CFIB Advocacy Power', description: '100,000 members. One powerful voice at Queen\'s Park and Ottawa.', benefit: `Recent wins: $1,200 WSIB Surplus rebate per employer (2026), Canada Carbon Rebate ($${data.employees * 98}), Red Tape reduction saving businesses 40+ hours/year. Your membership funds the research and lobbying that protects your bottom line.`, value: 1200 + (data.employees * 98) });
+                    recoveryActions.push({ icon: '🏛️', title: 'CFIB Advocacy Power', description: '100,000 members. One powerful voice at Queen\'s Park and Ottawa.', benefit: `Recent wins: $${wsibSurplus.toLocaleString()} WSIB Surplus rebate (2026 - $250/employee), Canada Carbon Rebate ($${carbonRebate.toLocaleString()}), Red Tape reduction saving businesses 40+ hours/year. Your membership funds the research and lobbying that protects your bottom line.`, value: totalAdvocacyValue });
                 }
                 
                 return { score: Math.max(0, Math.min(100, score)), vulnerabilities, recoveryActions };

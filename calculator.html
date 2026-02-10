@@ -263,8 +263,30 @@
         .breakdown-item {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             padding: 12px 0;
             border-bottom: 1px solid rgba(255,255,255,0.1);
+            gap: 10px;
+        }
+        
+        .breakdown-item.unchecked {
+            opacity: 0.4;
+            text-decoration: line-through;
+        }
+        
+        .breakdown-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        .breakdown-item .item-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex: 1;
+            gap: 10px;
         }
         
         .breakdown-item:last-child {
@@ -278,6 +300,45 @@
         .breakdown-item .value {
             font-weight: 700;
             font-size: 16px;
+        }
+        
+        .tooltip-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: help;
+            margin-left: 8px;
+            flex-shrink: 0;
+        }
+        
+        .tooltip-icon:hover {
+            background: rgba(255,255,255,0.5);
+        }
+        
+        .tooltip-text {
+            display: none;
+            position: absolute;
+            background: #254B87;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            width: 300px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            margin-top: 5px;
+        }
+        
+        .tooltip-icon.active + .tooltip-text {
+            display: block;
         }
         
         .disclaimer {
@@ -508,18 +569,31 @@
          */
         const RECOVERY_CALCULATOR = {
             CONSTANTS: {
-                HOURLY_LEGAL_RATE: 350,           // LSO Average for Durham/Ontario
+                HOURLY_LEGAL_RATE: 300,           // Conservative legal/HR rate for Durham/Ontario
                 CARBON_REBATE_PER_EE: 98,         // 2025/26 SME Payout Avg (CCPC Only)
                 PAYWORKS_BASE_SAVINGS: 300,       // Conservative base payroll savings
                 PAYWORKS_PER_EE: 40,              // Conservative per employee savings
                 SHIPPING_ANNUAL: 2400,            // Conservative Freightcom/ShipTime estimate
                 INSURANCE_PER_EE: 200,            // Conservative 15-20% average per employee
-                WSIB_SURPLUS_2026: 1200,          // 2026 Ontario WSIB Surplus Rebate
+                WSIB_SURPLUS_PER_EE: 250,         // 2026 Ontario WSIB Surplus per employee
                 OWNER_TIME_VALUE: 75,             // Owner's hourly value
                 MEMBERSHIP_BASE: 34,
                 MEMBERSHIP_PER_EE: 3,
                 TELECOM_DISCOUNT: 200,            // Conservative 25% off Telus estimate
                 VUBIZ_VALUE_PER_EE: 500           // Conservative training value per employee
+            },
+            TOOLTIPS: {
+                'payment': 'Most businesses overpay 0.6-1.5% on card fees with flat-rate or tiered pricing. Interchange-plus pricing eliminates the markup and saves you the difference on every transaction.',
+                'payroll': 'If you currently use manual payroll, bank payroll, or pay full price for a service, the 40% CFIB/Payworks discount applies. Saves time and reduces CRA audit risk from manual errors.',
+                'shipping': 'Even occasional shippers save $200-400/month with member rates through Freightcom or ShipTime. If you ship 5+ packages per month, this saving applies to you.',
+                'insurance': 'Applies if you carry ANY commercial insurance: liability, property, commercial auto, cyber, E&O, or D&O. Average savings is 15-20% by switching to CFIB partner brokers.',
+                'telecom': 'CFIB members get 25% off Telus Business plans for internet, phone, and mobile. Applies if you have any business telecom services.',
+                'carbon': 'Federal Canada Carbon Rebate for incorporated small businesses (CCPC only). Automatically paid by CRA if you file corporate taxes and have employees.',
+                'wsib': '2026 WSIB Surplus distribution - Ontario is returning $2 billion to employers. This is your estimated share based on employee count ($250/employee). No action required if you pay WSIB.',
+                'legal': 'Based on actual legal/HR events you checked. Each event typically costs 2+ billable hours at $300/hr. CFIB Business Advisors handle these questions at no charge.',
+                'advisor': 'Unlimited access to CFIB Business Advisors (legal, HR, tax, operations). One consultation with a lawyer would cost $300+. Members call whenever needed at no extra charge.',
+                'hr': 'Access to HR Document Library with Ontario-compliant templates: employment contracts, termination letters, policies, handbooks. Saves you from paying $300/hr for lawyer-drafted documents.',
+                'vubiz': 'Unlimited online training courses for you and your team (or just you if solo). Professional development platforms typically charge $500-2,000 per employee annually. Included free with CFIB membership.'
             }
         };
 
@@ -572,20 +646,22 @@
                 breakdownItems.push({
                     label: 'Payment Processing (CFIB/Chase Interchange-plus)',
                     value: paymentSavings,
-                    category: 'immediate'
+                    category: 'immediate',
+                    tooltip: 'payment'
                 });
             }
             
             // 2. Payroll Savings (40% discount) - Conservative
             let payrollSavings = 0;
-            if (hasStaff && (payrollMethod === 'bank' || payrollMethod === 'service')) {
+            if (hasStaff && (payrollMethod === 'bank' || payrollMethod === 'service' || payrollMethod === 'manual')) {
                 payrollSavings = RECOVERY_CALCULATOR.CONSTANTS.PAYWORKS_BASE_SAVINGS + 
                                 (employees * RECOVERY_CALCULATOR.CONSTANTS.PAYWORKS_PER_EE);
                 immediateCash += payrollSavings;
                 breakdownItems.push({
                     label: 'Payroll Services (40% discount via Payworks)',
                     value: payrollSavings,
-                    category: 'immediate'
+                    category: 'immediate',
+                    tooltip: 'payroll'
                 });
             }
             
@@ -595,7 +671,8 @@
                 breakdownItems.push({
                     label: 'Shipping & Courier (75% off via Freightcom/ShipTime)',
                     value: RECOVERY_CALCULATOR.CONSTANTS.SHIPPING_ANNUAL,
-                    category: 'immediate'
+                    category: 'immediate',
+                    tooltip: 'shipping'
                 });
             }
             
@@ -606,7 +683,8 @@
                 label: 'Commercial Insurance (15-20% average savings)',
                 value: insuranceSavings,
                 category: 'immediate',
-                note: 'Plus access to personal home, auto, and pet insurance through Wawanesa, Sonnet, Petline, Economical'
+                note: 'Plus access to personal home, auto, and pet insurance through Wawanesa, Sonnet, Petline, Economical',
+                tooltip: 'insurance'
             });
             
             // 5. Telecom Savings
@@ -614,7 +692,8 @@
             breakdownItems.push({
                 label: 'Telecom (25% off Telus Business)',
                 value: RECOVERY_CALCULATOR.CONSTANTS.TELECOM_DISCOUNT,
-                category: 'immediate'
+                category: 'immediate',
+                tooltip: 'telecom'
             });
             
             // === ADVOCACY & PASSIVE RECOVERY ===
@@ -626,7 +705,8 @@
                 breakdownItems.push({
                     label: 'Canada Carbon Rebate for Small Business (CFIB advocacy win)',
                     value: carbonRebate,
-                    category: 'advocacy'
+                    category: 'advocacy',
+                    tooltip: 'carbon'
                 });
             } else if (!isCorp && hasStaff) {
                 const missedCarbon = employees * RECOVERY_CALCULATOR.CONSTANTS.CARBON_REBATE_PER_EE;
@@ -639,11 +719,13 @@
             
             // 7. WSIB Surplus 2026 (Anyone with staff)
             if (hasStaff) {
-                immediateCash += RECOVERY_CALCULATOR.CONSTANTS.WSIB_SURPLUS_2026;
+                const wsibSurplus = employees * RECOVERY_CALCULATOR.CONSTANTS.WSIB_SURPLUS_PER_EE;
+                immediateCash += wsibSurplus;
                 breakdownItems.push({
                     label: 'WSIB Surplus Distribution (2026 - CFIB pressure win)',
-                    value: RECOVERY_CALCULATOR.CONSTANTS.WSIB_SURPLUS_2026,
-                    category: 'advocacy'
+                    value: wsibSurplus,
+                    category: 'advocacy',
+                    tooltip: 'wsib'
                 });
             }
             
@@ -654,9 +736,10 @@
                 const legalSavings = legalEvents * 2 * RECOVERY_CALCULATOR.CONSTANTS.HOURLY_LEGAL_RATE;
                 avoidedCosts += legalSavings;
                 breakdownItems.push({
-                    label: `Avoided Professional Fees (${legalEvents} event${legalEvents > 1 ? 's' : ''} × 2 hours @ $350/hr)`,
+                    label: `Avoided Professional Fees (${legalEvents} event${legalEvents > 1 ? 's' : ''} × 2 hours @ $300/hr)`,
                     value: legalSavings,
-                    category: 'avoided'
+                    category: 'avoided',
+                    tooltip: 'legal'
                 });
             }
             
@@ -664,9 +747,10 @@
             const baseAdvisorValue = RECOVERY_CALCULATOR.CONSTANTS.HOURLY_LEGAL_RATE;
             avoidedCosts += baseAdvisorValue;
             breakdownItems.push({
-                label: 'Unlimited Business Advisor Access (vs. 1 consultation @ $350/hr)',
+                label: 'Unlimited Business Advisor Access (vs. 1 consultation @ $300/hr)',
                 value: baseAdvisorValue,
-                category: 'avoided'
+                category: 'avoided',
+                tooltip: 'advisor'
             });
             
             // 10. HR Risk Protection (low confidence)
@@ -676,21 +760,20 @@
                 breakdownItems.push({
                     label: 'HR Document Library & Compliance Protection',
                     value: hrProtection,
-                    category: 'avoided'
+                    category: 'avoided',
+                    tooltip: 'hr'
                 });
             }
             
-            // 11. Vubiz Training Library (Not counted in total, but shown as value)
-            if (hasStaff) {
-                const vubizValue = 2000; // Fixed value display
-                breakdownItems.push({
-                    label: `Vubiz Training Library Access`,
-                    value: 0, // Not counted in savings total
-                    category: 'avoided',
-                    isIncluded: true,
-                    displayValue: vubizValue
-                });
-            }
+            // 11. Vubiz Training Library (Always shown, counts toward savings)
+            const vubizValue = 1000; // Fixed value for all businesses
+            avoidedCosts += vubizValue;
+            breakdownItems.push({
+                label: `Vubiz Training Library Access`,
+                value: vubizValue,
+                category: 'avoided',
+                tooltip: 'vubiz'
+            });
             
             // === TIME RECOVERY ===
             const hoursPerYear = adminHours * 52;
@@ -720,6 +803,18 @@
         }
         
         function displayResults(data) {
+            // Initialize global totals for interactive toggling
+            const immediateTotal = data.breakdownItems.filter(i => i.category === 'immediate').reduce((sum, i) => sum + i.value, 0);
+            const advocacyTotal = data.breakdownItems.filter(i => i.category === 'advocacy').reduce((sum, i) => sum + i.value, 0);
+            const avoidedTotal = data.breakdownItems.filter(i => i.category === 'avoided').reduce((sum, i) => sum + i.value, 0);
+            
+            currentTotals = {
+                immediate: immediateTotal,
+                advocacy: advocacyTotal,
+                avoided: avoidedTotal,
+                membership: data.annualMembership
+            };
+            
             document.getElementById('totalSavings').textContent = '$' + data.totalSavings.toLocaleString();
             document.getElementById('membershipCost').textContent = '$' + data.monthlyMembership + '/month';
             document.getElementById('annualCost').textContent = '($' + data.annualMembership.toLocaleString() + '/year)';
@@ -743,15 +838,23 @@
             
             if (immediateItems.length > 0) {
                 breakdownHTML += '<div style="margin-bottom: 20px;"><strong style="color: #20AA3F; font-size: 16px; display: block; margin-bottom: 10px;">💰 Immediate Operational Savings</strong>';
-                immediateItems.forEach(item => {
+                immediateItems.forEach((item, index) => {
+                    const itemId = `immediate-${index}`;
+                    const tooltipText = item.tooltip ? RECOVERY_CALCULATOR.TOOLTIPS[item.tooltip] : '';
                     breakdownHTML += `
-                        <div class="breakdown-item">
-                            <div class="label">${item.label}</div>
-                            <div class="value">$${item.value.toLocaleString()}</div>
+                        <div class="breakdown-item" id="item-${itemId}">
+                            <input type="checkbox" id="check-${itemId}" checked onchange="toggleItem('${itemId}', ${item.value}, 'immediate')">
+                            <div class="item-content">
+                                <div class="label">
+                                    ${item.label}
+                                    ${tooltipText ? `<span class="tooltip-icon" onclick="toggleTooltip(this)">?</span><div class="tooltip-text">${tooltipText}</div>` : ''}
+                                </div>
+                                <div class="value">$${item.value.toLocaleString()}</div>
+                            </div>
                         </div>
                     `;
                     if (item.note) {
-                        breakdownHTML += `<div style="font-size: 13px; color: white; font-style: italic; margin: 5px 0 10px 0; padding-left: 10px; opacity: 0.9;">${item.note}</div>`;
+                        breakdownHTML += `<div style="font-size: 13px; color: white; font-style: italic; margin: 5px 0 10px 30px; opacity: 0.9;">${item.note}</div>`;
                     }
                 });
                 breakdownHTML += '</div>';
@@ -759,11 +862,19 @@
             
             if (advocacyItems.length > 0) {
                 breakdownHTML += '<div style="margin-bottom: 20px;"><strong style="color: #D31145; font-size: 16px; display: block; margin-bottom: 10px;">🏛️ Advocacy & Legislative Wins</strong>';
-                advocacyItems.forEach(item => {
+                advocacyItems.forEach((item, index) => {
+                    const itemId = `advocacy-${index}`;
+                    const tooltipText = item.tooltip ? RECOVERY_CALCULATOR.TOOLTIPS[item.tooltip] : '';
                     breakdownHTML += `
-                        <div class="breakdown-item">
-                            <div class="label">${item.label}</div>
-                            <div class="value">$${item.value.toLocaleString()}</div>
+                        <div class="breakdown-item" id="item-${itemId}">
+                            <input type="checkbox" id="check-${itemId}" checked onchange="toggleItem('${itemId}', ${item.value}, 'advocacy')">
+                            <div class="item-content">
+                                <div class="label">
+                                    ${item.label}
+                                    ${tooltipText ? `<span class="tooltip-icon" onclick="toggleTooltip(this)">?</span><div class="tooltip-text">${tooltipText}</div>` : ''}
+                                </div>
+                                <div class="value">$${item.value.toLocaleString()}</div>
+                            </div>
                         </div>
                     `;
                 });
@@ -772,23 +883,22 @@
             
             if (avoidedItems.length > 0) {
                 breakdownHTML += '<div style="margin-bottom: 20px;"><strong style="color: #f39200; font-size: 16px; display: block; margin-bottom: 10px;">🛡️ Avoided Professional Costs</strong>';
-                avoidedItems.forEach(item => {
-                    if (item.isIncluded) {
-                        // Special display for Vubiz (included benefit) - same styling as others
-                        breakdownHTML += `
-                            <div class="breakdown-item">
-                                <div class="label">${item.label}</div>
-                                <div class="value" style="color: #20AA3F; font-weight: 700;">Included (Value: $${item.displayValue.toLocaleString()}/year)</div>
-                            </div>
-                        `;
-                    } else {
-                        breakdownHTML += `
-                            <div class="breakdown-item">
-                                <div class="label">${item.label}</div>
+                avoidedItems.forEach((item, index) => {
+                    const itemId = `avoided-${index}`;
+                    const tooltipText = item.tooltip ? RECOVERY_CALCULATOR.TOOLTIPS[item.tooltip] : '';
+                    
+                    breakdownHTML += `
+                        <div class="breakdown-item" id="item-${itemId}">
+                            <input type="checkbox" id="check-${itemId}" checked onchange="toggleItem('${itemId}', ${item.value}, 'avoided')">
+                            <div class="item-content">
+                                <div class="label">
+                                    ${item.label}
+                                    ${tooltipText ? `<span class="tooltip-icon" onclick="toggleTooltip(this)">?</span><div class="tooltip-text">${tooltipText}</div>` : ''}
+                                </div>
                                 <div class="value">$${item.value.toLocaleString()}</div>
                             </div>
-                        `;
-                    }
+                        </div>
+                    `;
                 });
                 breakdownHTML += '</div>';
             }
@@ -920,6 +1030,70 @@
             calculateSavings();
             return false;
         });
+        
+        // Global variables to track current totals
+        let currentTotals = {
+            immediate: 0,
+            advocacy: 0,
+            avoided: 0,
+            membership: 0
+        };
+        
+        function toggleItem(itemId, value, category) {
+            const checkbox = document.getElementById(`check-${itemId}`);
+            const item = document.getElementById(`item-${itemId}`);
+            
+            if (checkbox.checked) {
+                item.classList.remove('unchecked');
+                currentTotals[category] += value;
+            } else {
+                item.classList.add('unchecked');
+                currentTotals[category] -= value;
+            }
+            
+            updateTotals();
+        }
+        
+        function updateTotals() {
+            const totalSavings = currentTotals.immediate + currentTotals.advocacy + currentTotals.avoided;
+            const netBenefit = totalSavings - currentTotals.membership;
+            const roiRatio = (totalSavings / currentTotals.membership).toFixed(1);
+            
+            // Update display
+            document.getElementById('totalSavings').textContent = '$' + totalSavings.toLocaleString();
+            
+            // Calculate tax savings
+            const taxSavings = Math.round(currentTotals.membership * 0.30);
+            const afterTaxCost = currentTotals.membership - taxSavings;
+            const netBenefitAfterTax = totalSavings - afterTaxCost;
+            
+            document.getElementById('taxSavings').textContent = `In a 30% tax bracket, you save $${taxSavings}/year, making your real cost just $${afterTaxCost}.`;
+            document.getElementById('roiSummary').textContent = `You're $${netBenefitAfterTax.toLocaleString()} ahead in year one (after-tax)`;
+        }
+        
+        function toggleTooltip(element) {
+            // Close all other tooltips
+            document.querySelectorAll('.tooltip-icon.active').forEach(icon => {
+                if (icon !== element) {
+                    icon.classList.remove('active');
+                }
+            });
+            
+            // Toggle this tooltip
+            element.classList.toggle('active');
+            
+            // Close tooltip when clicking anywhere else
+            if (element.classList.contains('active')) {
+                setTimeout(() => {
+                    document.addEventListener('click', function closeTooltip(e) {
+                        if (!element.contains(e.target)) {
+                            element.classList.remove('active');
+                            document.removeEventListener('click', closeTooltip);
+                        }
+                    });
+                }, 100);
+            }
+        }
     </script>
 </body>
 </html>
