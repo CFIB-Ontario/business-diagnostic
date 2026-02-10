@@ -248,6 +248,40 @@
             border-radius: 8px;
         }
         
+        .roi-box {
+            background: linear-gradient(135deg, #20AA3F 0%, #178a32 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            margin: 30px 0;
+            box-shadow: 0 8px 24px rgba(32,170,63,0.3);
+        }
+        
+        .roi-box .roi-multiplier {
+            font-size: 64px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .roi-box .roi-description {
+            font-size: 20px;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+        
+        .roi-indicator {
+            display: inline-block;
+            background: rgba(32,170,63,0.2);
+            color: #20AA3F;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
         .breakdown {
             margin-top: 30px;
             padding-top: 30px;
@@ -524,10 +558,16 @@
                 <div class="big-number" id="totalSavings">$0</div>
             </div>
             
+            <div class="roi-box" id="roiBox">
+                <div class="roi-multiplier" id="roiMultiplier">0x</div>
+                <div class="roi-description" id="roiDescription">You're $0 ahead in year one (after-tax)</div>
+            </div>
+            
             <div class="membership-cost">
                 <p>Your Monthly Membership Investment</p>
                 <div class="cost" id="membershipCost">$0</div>
                 <p style="margin-top: 10px; font-size: 14px;" id="annualCost">($0/year)</p>
+                <div class="roi-indicator" id="roiIndicator">0x ROI</div>
                 <div style="margin-top: 15px; padding: 12px; background: rgba(32,170,63,0.15); border-radius: 8px; border-left: 4px solid #20AA3F;">
                     <div style="font-size: 14px; font-weight: 600; color: #20AA3F; margin-bottom: 5px;">💰 100% Tax Deductible</div>
                     <div style="font-size: 13px; color: #333; line-height: 1.5;">As a registered non-profit, CFIB memberships are a deductible business expense. <span id="taxSavings" style="font-weight: 700;"></span></div>
@@ -829,6 +869,12 @@
             document.getElementById('roiSummary').textContent = 
                 `You're $${netBenefitAfterTax.toLocaleString()} ahead in year one (after-tax)`;
             
+            // Update ROI displays in both locations
+            const roiRatio = data.roiRatio;
+            document.getElementById('roiMultiplier').textContent = `${roiRatio}x RETURN`;
+            document.getElementById('roiDescription').textContent = `You're $${netBenefitAfterTax.toLocaleString()} ahead in year one (after-tax)`;
+            document.getElementById('roiIndicator').textContent = `${roiRatio}x ROI`;
+            
             // Build breakdown by category
             const immediateItems = data.breakdownItems.filter(i => i.category === 'immediate');
             const advocacyItems = data.breakdownItems.filter(i => i.category === 'advocacy');
@@ -1059,16 +1105,20 @@
             const netBenefit = totalSavings - currentTotals.membership;
             const roiRatio = (totalSavings / currentTotals.membership).toFixed(1);
             
-            // Update display
-            document.getElementById('totalSavings').textContent = '$' + totalSavings.toLocaleString();
-            
             // Calculate tax savings
             const taxSavings = Math.round(currentTotals.membership * 0.30);
             const afterTaxCost = currentTotals.membership - taxSavings;
             const netBenefitAfterTax = totalSavings - afterTaxCost;
             
+            // Update display
+            document.getElementById('totalSavings').textContent = '$' + totalSavings.toLocaleString();
             document.getElementById('taxSavings').textContent = `In a 30% tax bracket, you save $${taxSavings}/year, making your real cost just $${afterTaxCost}.`;
             document.getElementById('roiSummary').textContent = `You're $${netBenefitAfterTax.toLocaleString()} ahead in year one (after-tax)`;
+            
+            // Update ROI displays
+            document.getElementById('roiMultiplier').textContent = `${roiRatio}x RETURN`;
+            document.getElementById('roiDescription').textContent = `You're $${netBenefitAfterTax.toLocaleString()} ahead in year one (after-tax)`;
+            document.getElementById('roiIndicator').textContent = `${roiRatio}x ROI`;
         }
         
         function toggleTooltip(element) {
