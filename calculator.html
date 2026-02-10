@@ -610,8 +610,8 @@
             const adminHours = parseInt(document.getElementById('adminHours').value);
             const hrConfidence = parseInt(document.getElementById('hrConfidence').value);
             
-            // Count legal events
-            const legalEvents = document.querySelectorAll('input[type="checkbox"]:checked').length;
+            // Count legal events - only the 4 specific legal health check boxes
+            const legalEvents = document.querySelectorAll('#event1:checked, #event2:checked, #event3:checked, #event4:checked').length;
             
             // Determine if incorporated
             const isCorp = (businessStructure === 'incorporated');
