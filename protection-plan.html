@@ -143,17 +143,37 @@
         document.addEventListener('DOMContentLoaded', function() {
             const savedData = localStorage.getItem('cfib_calculator_data');
             
+            console.log('Protection Plan - Saved Data:', savedData); // Debug
+            
             if (!savedData) {
                 document.getElementById('mainContent').innerHTML = `<div class="no-data-message"><h2>Complete the ROI Calculator First</h2><p>To generate your personalized recovery plan, we need to analyze your business vulnerabilities.</p><a href="calculator.html">Go to ROI Calculator →</a></div>`;
                 return;
             }
             
             const data = JSON.parse(savedData);
+            console.log('Protection Plan - Parsed Data:', data); // Debug
+            
             const result = PROTECTION_ALGORITHM.calculateScore(data);
+            console.log('Protection Plan - Calculated Result:', result); // Debug
+            
             generateRecoveryPlan(result, data);
         });
         
         function generateRecoveryPlan(result, data) {
+            console.log('Generating Recovery Plan - Result:', result, 'Data:', data); // Debug
+            
+            // If no vulnerabilities or recovery actions, show error
+            if (result.vulnerabilities.length === 0 && result.recoveryActions.length === 0) {
+                document.getElementById('mainContent').innerHTML = `
+                    <div class="no-data-message">
+                        <h2>No Vulnerabilities Detected</h2>
+                        <p>Based on your responses, you appear to have excellent coverage already!</p>
+                        <p>However, this might indicate incomplete calculator data. Please go back and ensure all fields are filled out.</p>
+                        <a href="calculator.html">← Back to Calculator</a>
+                    </div>`;
+                return;
+            }
+            
             let scoreColor, scoreLabel, scoreMessage;
             if (result.score < 40) {
                 scoreColor = '#D31145'; scoreLabel = 'HIGHLY VULNERABLE'; scoreMessage = 'Your business is exposed to significant operational and financial risks. Immediate action is critical.';

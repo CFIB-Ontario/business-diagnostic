@@ -989,6 +989,13 @@
         }
         
         function saveCalculatorData() {
+            // Verify results have been calculated
+            const resultsDiv = document.getElementById('results');
+            if (!resultsDiv || resultsDiv.style.display === 'none') {
+                alert('Please calculate your ROI first by filling out the form above.');
+                return false;
+            }
+            
             // Get industry value (use custom if "other" selected)
             const industrySelect = document.getElementById('industry').value;
             const industryValue = industrySelect === 'other' 
@@ -1024,10 +1031,14 @@
                 timestamp: Date.now()
             };
             
+            console.log('Saving calculator data:', calcData); // Debug
+            
             localStorage.setItem('cfib_calculator_data', JSON.stringify(calcData));
             
             // Also save to backend tracking (you can add email endpoint here)
             saveToBackend(calcData);
+            
+            return true;
         }
         
         function toggleOtherIndustry() {
