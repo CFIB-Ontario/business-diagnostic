@@ -294,26 +294,32 @@
             const afterTaxCost = window.afterTaxCost;
             const netGain = window.netGain;
             
-            // Build detailed breakdown for email with HTML formatting
+            // Build detailed breakdown for email with clear separators
             let vulnerabilitiesText = '';
             result.vulnerabilities.forEach((vuln, index) => {
-                vulnerabilitiesText += `<strong>${index + 1}. ${vuln.title}</strong><br>`;
-                vulnerabilitiesText += `&nbsp;&nbsp;&nbsp;Impact: ${vuln.impact}<br>`;
-                vulnerabilitiesText += `&nbsp;&nbsp;&nbsp;Cost: ${vuln.cost}<br><br>`;
+                vulnerabilitiesText += `\n${index + 1}. ${vuln.title}\n`;
+                vulnerabilitiesText += `   Impact: ${vuln.impact}\n`;
+                vulnerabilitiesText += `   Cost: ${vuln.cost}\n`;
+                vulnerabilitiesText += `   ─────────────────────────────────\n`;
             });
             
             let recoveryActionsText = '';
             result.recoveryActions.forEach((action, index) => {
-                recoveryActionsText += `<strong>${index + 1}. ${action.title}</strong><br>`;
-                recoveryActionsText += `&nbsp;&nbsp;&nbsp;Description: ${action.description}<br>`;
-                recoveryActionsText += `&nbsp;&nbsp;&nbsp;Benefit: ${action.benefit}<br>`;
-                recoveryActionsText += `&nbsp;&nbsp;&nbsp;Value: $${action.value.toLocaleString()}/year<br><br>`;
+                recoveryActionsText += `\n${index + 1}. ${action.title}\n`;
+                recoveryActionsText += `   Description: ${action.description}\n`;
+                recoveryActionsText += `   Benefit: ${action.benefit}\n`;
+                recoveryActionsText += `   Value: $${action.value.toLocaleString()}/year\n`;
+                recoveryActionsText += `   ─────────────────────────────────\n`;
             });
             
             // Prepare form data for Formspark with clean field names
             const formData = {
                 _email: {
-                    subject: `🎯 Protection Plan Results - ${data.businessName || 'Business'} (Score: ${result.score}/100)`
+                    subject: `🎯 Protection Plan Results - ${data.businessName || 'Business'} (Score: ${result.score}/100)`,
+                    template: {
+                        title: false,
+                        footer: false
+                    }
                 },
                 'Business Name': data.businessName || 'N/A',
                 'City/Location': data.cityLocation || 'N/A',
