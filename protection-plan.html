@@ -294,20 +294,20 @@
             const afterTaxCost = window.afterTaxCost;
             const netGain = window.netGain;
             
-            // Build detailed breakdown for email
+            // Build detailed breakdown for email with HTML formatting
             let vulnerabilitiesText = '';
             result.vulnerabilities.forEach((vuln, index) => {
-                vulnerabilitiesText += `${index + 1}. ${vuln.title}\n`;
-                vulnerabilitiesText += `   Impact: ${vuln.impact}\n`;
-                vulnerabilitiesText += `   Cost: ${vuln.cost}\n\n`;
+                vulnerabilitiesText += `<strong>${index + 1}. ${vuln.title}</strong><br>`;
+                vulnerabilitiesText += `&nbsp;&nbsp;&nbsp;Impact: ${vuln.impact}<br>`;
+                vulnerabilitiesText += `&nbsp;&nbsp;&nbsp;Cost: ${vuln.cost}<br><br>`;
             });
             
             let recoveryActionsText = '';
             result.recoveryActions.forEach((action, index) => {
-                recoveryActionsText += `${index + 1}. ${action.title}\n`;
-                recoveryActionsText += `   Description: ${action.description}\n`;
-                recoveryActionsText += `   Benefit: ${action.benefit}\n`;
-                recoveryActionsText += `   Value: $${action.value.toLocaleString()}/year\n\n`;
+                recoveryActionsText += `<strong>${index + 1}. ${action.title}</strong><br>`;
+                recoveryActionsText += `&nbsp;&nbsp;&nbsp;Description: ${action.description}<br>`;
+                recoveryActionsText += `&nbsp;&nbsp;&nbsp;Benefit: ${action.benefit}<br>`;
+                recoveryActionsText += `&nbsp;&nbsp;&nbsp;Value: $${action.value.toLocaleString()}/year<br><br>`;
             });
             
             // Prepare form data for Formspark with clean field names
