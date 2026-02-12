@@ -6,7 +6,6 @@
     <title>Business Recovery Plan | CFIB Durham</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Montserrat', sans-serif; background-color: #f4f7f9; min-height: 100vh; padding: 20px; }
@@ -86,9 +85,6 @@
     <div class="container" id="mainContent"></div>
     
     <script>
-        // Initialize EmailJS
-        emailjs.init('wvlsJY8bfsjkuqzIj');
-        
         const PROTECTION_ALGORITHM = {
             WEIGHTS: { MERCHANT_GAP: 10, HR_LEGAL_GAP: 15, PAYROLL_GAP: 10, TAX_REBATE_GAP: 10, TIME_POVERTY: 10, ADVOCACY_GAP: 5 },
             
@@ -188,7 +184,9 @@
                 scoreColor = '#20AA3F'; scoreLabel = 'STRONG COVERAGE'; scoreMessage = 'You\'re in better shape than most, but there are still opportunities to optimize and protect.';
             }
             
-            const totalRecovery = result.recoveryActions.reduce((sum, action) => sum + action.value, 0);
+            const totalRecovery = result.recoveryActions
+                .filter(action => action.title !== 'Time Recovery System')
+                .reduce((sum, action) => sum + action.value, 0);
             const membershipCost = (34 + (data.employees * 3)) * 12;
             const taxSavings = Math.round(membershipCost * 0.30); // 30% tax bracket
             const afterTaxCost = membershipCost - taxSavings;
@@ -276,7 +274,7 @@
                 ? `You're not in crisis, but you're at risk. The Recovery Plan above closes your gaps and moves you to ${projectedScore}/100. The membership pays for itself in under 3 months. Should we activate your profile this week?`
                 : `Even with a strong score of ${result.score}/100, we've found opportunities to optimize to ${projectedScore}/100. Let's lock in these protections and savings. Ready to activate?`;
             
-            html += `<div class="next-steps"><h3>The Brutally Honest Next Steps</h3><div class="cta-text">${ctaMessage}</div><div class="cta-buttons"><a href="mailto:jason@cfib-durham.ca?subject=Recovery Plan - Protection Score ${result.score}" class="cta-btn cta-btn-primary">📧 Schedule My Recovery Call</a><button onclick="emailResults()" class="cta-btn cta-btn-secondary" style="border: none;">📄 My Results</button><a href="index.html" class="cta-btn cta-btn-secondary">🔄 Start Over</a></div></div>`;
+            html += `<div class="next-steps"><h3>The Brutally Honest Next Steps</h3><div class="cta-text">${ctaMessage}</div><div class="cta-buttons"><a href="mailto:jason@cfib-durham.ca?subject=Recovery Plan - Protection Score ${result.score}" class="cta-btn cta-btn-primary">📧 Schedule My Recovery Call</a><button onclick="downloadAndEmailResults()" class="cta-btn cta-btn-secondary" style="border: none;">📄 Download PDF</button><a href="index.html" class="cta-btn cta-btn-secondary">🔄 Start Over</a></div></div>`;
             
             document.getElementById('mainContent').innerHTML = html;
             
@@ -290,7 +288,7 @@
             window.netGain = netGain;
         }
         
-        function emailResults() {
+        function downloadAndEmailResults() {
             const result = window.currentResult;
             const data = window.currentData;
             const totalRecovery = window.totalRecovery;
@@ -299,7 +297,14 @@
             const afterTaxCost = window.afterTaxCost;
             const netGain = window.netGain;
             
-            // Prepare form data with individual fields for clean email display
+            // First, submit to Formspark (sends email to you)
+            submitToFormspark(result, data, totalRecovery, membershipCost, taxSavings, afterTaxCost, netGain);
+            
+            // Then, generate and download PDF for user
+            downloadPDF(result, data, totalRecovery, membershipCost, taxSavings, afterTaxCost, netGain);
+        }
+        
+        function submitToFormspark(result, data, totalRecovery, membershipCost, taxSavings, afterTaxCost, netGain) {// Prepare form data with individual fields for clean email display
             const formData = {
                 _email: {
                     subject: `🎯 Protection Plan Results - ${data.businessName || 'Business'} (Score: ${result.score}/100)`,
@@ -355,24 +360,14 @@
             })
             .then(response => response.json())
             .then(data => {
-                // Formspark returns {ok: true} on success
-                if (data.ok !== false) {
-                    // After Formspark succeeds, generate and send PDF via EmailJS
-                    generateAndSendPDF();
-                    alert('✅ Results sent to CFIB Durham!\n\nWe\'ll email you a detailed breakdown within 24 hours.\n\nThank you for using the Business Diagnostic Tool!');
-                } else {
-                    alert('⚠️ There was an issue sending your results.\n\nPlease contact jason@cfib-durham.ca directly or try the "Schedule My Recovery Call" button above.');
-                }
+                console.log('Formspark submission successful');
             })
             .catch(error => {
-                // Even if there's a CORS or network error, the form likely still submitted
-                console.log('Fetch completed:', error);
-                generateAndSendPDF(); // Still send PDF
-                alert('✅ Results sent to CFIB Durham!\n\nWe\'ll email you a detailed breakdown within 24 hours.\n\nThank you for using the Business Diagnostic Tool!');
+                console.log('Formspark submission completed:', error);
             });
         }
         
-        function generateAndSendPDF() {
+        function downloadPDF(result, data, totalRecovery, membershipCost, taxSavings, afterTaxCost, netGain) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
@@ -567,21 +562,9 @@
             doc.setFontSize(14);
             doc.text(`$${netGain.toLocaleString()}`, pageWidth - margin - 40, y);
             
-            // Convert PDF to base64
-            const pdfBase64 = doc.output('datauristring').split(',')[1];
-            
-            // Send via EmailJS
-            emailjs.send('service_o6x7g6n', 'template_wd6kpbp', {
-                business_name: data.businessName || 'N/A',
-                city_location: data.cityLocation || 'N/A',
-                protection_score: `${result.score}/100`,
-                pdf_attachment: pdfBase64
-            })
-            .then(function(response) {
-                console.log('PDF sent successfully via EmailJS', response.status, response.text);
-            }, function(error) {
-                console.error('EmailJS failed to send PDF:', error);
-            });
+            // Download PDF for user
+            const fileName = `CFIB-Recovery-Plan-${data.businessName ? data.businessName.replace(/[^a-z0-9]/gi, '_') : 'Business'}.pdf`;
+            doc.save(fileName);
         }
     </script>
 </body>
