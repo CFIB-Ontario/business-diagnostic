@@ -313,132 +313,45 @@
             if (data.legalEventDetails?.advice) legalChecks.push('Legal Advice');
             const legalHealthCheck = legalChecks.length > 0 ? legalChecks.join(', ') : 'None selected';
             
-            // Build HTML formatted vulnerabilities section
-            let vulnerabilitiesHTML = '';
-            result.vulnerabilities.forEach((vuln, index) => {
-                vulnerabilitiesHTML += `
-                    <div style="margin-bottom: 15px; padding: 12px; background: #f9f9f9; border-left: 4px solid #D31145; border-radius: 4px;">
-                        <strong style="color: #D31145; font-size: 16px;">${index + 1}. ${vuln.title}</strong><br>
-                        <div style="margin-top: 8px; color: #555;">
-                            <strong>Impact:</strong> ${vuln.impact}<br>
-                            <strong>Cost:</strong> ${vuln.cost}
-                        </div>
-                    </div>`;
-            });
-            
-            // Build HTML formatted recovery actions section
-            let recoveryActionsHTML = '';
-            result.recoveryActions.forEach((action, index) => {
-                recoveryActionsHTML += `
-                    <div style="margin-bottom: 15px; padding: 12px; background: #f9f9f9; border-left: 4px solid #20AA3F; border-radius: 4px;">
-                        <strong style="color: #20AA3F; font-size: 16px;">${index + 1}. ${action.title}</strong> 
-                        <span style="color: #20AA3F; font-weight: bold; font-size: 15px;">- $${action.value.toLocaleString()}/year</span><br>
-                        <div style="margin-top: 8px; color: #555;">
-                            <strong>Description:</strong> ${action.description}<br>
-                            <strong>Benefit:</strong> ${action.benefit}
-                        </div>
-                    </div>`;
-            });
-            
-            // Build complete HTML email
-            const emailHTML = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <style>
-                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 700px; margin: 0 auto; }
-                        .header { background: #254B87; color: white; padding: 20px; margin-bottom: 20px; }
-                        .header h1 { margin: 0; font-size: 24px; }
-                        .section { margin-bottom: 30px; }
-                        .section h2 { color: #254B87; border-bottom: 2px solid #254B87; padding-bottom: 8px; margin-bottom: 15px; }
-                        .info-grid { display: grid; grid-template-columns: 200px 1fr; gap: 10px; margin-bottom: 20px; }
-                        .info-label { font-weight: bold; color: #666; }
-                        .score-box { background: #f0f0f0; padding: 15px; border-radius: 8px; text-align: center; margin: 20px 0; }
-                        .score-value { font-size: 32px; font-weight: bold; color: #254B87; }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <h1>🎯 Protection Plan Results</h1>
-                        <p style="margin: 5px 0 0 0; opacity: 0.9;">CFIB Durham Region - Business Diagnostic</p>
-                    </div>
-                    
-                    <div class="section">
-                        <h2>Business Information</h2>
-                        <div class="info-grid">
-                            <div class="info-label">Business Name:</div>
-                            <div>${data.businessName || 'N/A'}</div>
-                            
-                            <div class="info-label">City/Location:</div>
-                            <div>${data.cityLocation || 'N/A'}</div>
-                            
-                            <div class="info-label">Employees:</div>
-                            <div>${data.employees || 0}</div>
-                            
-                            <div class="info-label">Industry:</div>
-                            <div>${data.industry || 'N/A'}</div>
-                            
-                            <div class="info-label">Business Structure:</div>
-                            <div>${data.businessStructure || 'N/A'}</div>
-                            
-                            <div class="info-label">Pain Point:</div>
-                            <div>${data.painPoint || 'Not selected'}</div>
-                            
-                            <div class="info-label">Legal Health Check:</div>
-                            <div>${legalHealthCheck}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="score-box">
-                        <div style="color: #666; font-size: 14px; margin-bottom: 5px;">PROTECTION SCORE</div>
-                        <div class="score-value">${result.score}/100</div>
-                    </div>
-                    
-                    <div class="section">
-                        <div class="info-grid" style="margin-bottom: 20px;">
-                            <div class="info-label">Total Recovery:</div>
-                            <div style="color: #20AA3F; font-weight: bold; font-size: 18px;">$${totalRecovery.toLocaleString()}</div>
-                            
-                            <div class="info-label">Membership Cost:</div>
-                            <div>$${membershipCost.toLocaleString()}/year</div>
-                            
-                            <div class="info-label">Tax Deduction:</div>
-                            <div style="color: #20AA3F;">-$${taxSavings.toLocaleString()}</div>
-                            
-                            <div class="info-label">After-Tax Cost:</div>
-                            <div>$${afterTaxCost.toLocaleString()}/year</div>
-                            
-                            <div class="info-label">Net Annual Gain:</div>
-                            <div style="color: #20AA3F; font-weight: bold; font-size: 18px;">$${netGain.toLocaleString()}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="section">
-                        <h2 style="color: #D31145;">Vulnerabilities</h2>
-                        ${vulnerabilitiesHTML}
-                    </div>
-                    
-                    <div class="section">
-                        <h2 style="color: #20AA3F;">Recovery Actions</h2>
-                        ${recoveryActionsHTML}
-                    </div>
-                    
-                    <div style="margin-top: 30px; padding: 15px; background: #f0f0f0; border-radius: 8px; font-size: 12px; color: #666;">
-                        <strong>Timestamp:</strong> ${new Date().toLocaleString()}<br>
-                        <em>Generated by CFIB Durham Business Diagnostic Tool</em>
-                    </div>
-                </body>
-                </html>
-            `;
-            
-            // Prepare form data for FormSubmit
+            // Prepare form data for FormSubmit with individual fields
             const formData = {
                 _subject: `🎯 Protection Plan Results - ${data.businessName || 'Business'} (Score: ${result.score}/100)`,
                 _captcha: 'false',
-                _template: 'box',
-                message: emailHTML
+                _template: 'table',
+                'Business Name': data.businessName || 'N/A',
+                'City/Location': data.cityLocation || 'N/A',
+                'Employees': data.employees || 0,
+                'Industry': data.industry || 'N/A',
+                'Business Structure': data.businessStructure || 'N/A',
+                'Pain Point': data.painPoint || 'Not selected',
+                'Legal Health Check': legalHealthCheck,
+                'Protection Score': `${result.score}/100`,
+                'Total Recovery': `$${totalRecovery.toLocaleString()}`,
+                'Membership Cost': `$${membershipCost.toLocaleString()}/year`,
+                'Tax Deduction': `$${taxSavings.toLocaleString()}`,
+                'After-Tax Cost': `$${afterTaxCost.toLocaleString()}/year`,
+                'Net Annual Gain': `$${netGain.toLocaleString()}`,
+                '---': '--- VULNERABILITIES ---'
             };
+            
+            // Add each vulnerability as 3 separate fields
+            result.vulnerabilities.forEach((vuln, index) => {
+                formData[`Vuln ${index + 1} - Title`] = vuln.title;
+                formData[`Vuln ${index + 1} - Impact`] = vuln.impact;
+                formData[`Vuln ${index + 1} - Cost`] = vuln.cost;
+            });
+            
+            formData['----'] = '--- RECOVERY ACTIONS ---';
+            
+            // Add each recovery action as 4 separate fields
+            result.recoveryActions.forEach((action, index) => {
+                formData[`Recovery ${index + 1} - Title`] = action.title;
+                formData[`Recovery ${index + 1} - Value`] = `$${action.value.toLocaleString()}/year`;
+                formData[`Recovery ${index + 1} - Description`] = action.description;
+                formData[`Recovery ${index + 1} - Benefit`] = action.benefit;
+            });
+            
+            formData['Timestamp'] = new Date().toLocaleString();
             
             // Submit to FormSubmit (sends to jasoncfib@gmail.com)
             fetch('https://formsubmit.co/jasoncfib@gmail.com', {
