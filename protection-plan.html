@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Business Recovery Plan | CFIB Durham</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Montserrat', sans-serif; background-color: #f4f7f9; min-height: 100vh; padding: 20px; }
@@ -84,6 +86,9 @@
     <div class="container" id="mainContent"></div>
     
     <script>
+        // Initialize EmailJS
+        emailjs.init('wvlsJY8bfsjkuqzIj');
+        
         const PROTECTION_ALGORITHM = {
             WEIGHTS: { MERCHANT_GAP: 10, HR_LEGAL_GAP: 15, PAYROLL_GAP: 10, TAX_REBATE_GAP: 10, TIME_POVERTY: 10, ADVOCACY_GAP: 5 },
             
@@ -314,6 +319,7 @@
                 'Tax Deduction': `$${taxSavings.toLocaleString()}`,
                 'After-Tax Cost': `$${afterTaxCost.toLocaleString()}/year`,
                 'Net Annual Gain': `$${netGain.toLocaleString()}`,
+                ' ': '',  // Blank spacing
                 '---': '--- VULNERABILITIES ---'
             };
             
@@ -322,6 +328,7 @@
                 formData[`Vulnerability ${index + 1}`] = `${vuln.title} | Impact: ${vuln.impact} | Cost: ${vuln.cost}`;
             });
             
+            formData['  '] = '';  // Blank spacing
             formData['----'] = '--- RECOVERY ACTIONS ---';
             
             // Add each recovery action as a separate field
@@ -329,6 +336,7 @@
                 formData[`Recovery ${index + 1}`] = `${action.title} | Value: $${action.value.toLocaleString()}/year | Description: ${action.description} | Benefit: ${action.benefit}`;
             });
             
+            formData['   '] = '';  // Blank spacing
             formData['Timestamp'] = new Date().toLocaleString();
             
             // Submit to Formspark (sends to jasoncfib@gmail.com)
@@ -344,6 +352,8 @@
             .then(data => {
                 // Formspark returns {ok: true} on success
                 if (data.ok !== false) {
+                    // After Formspark succeeds, generate and send PDF via EmailJS
+                    generateAndSendPDF();
                     alert('✅ Results sent to CFIB Durham!\n\nWe\'ll email you a detailed breakdown within 24 hours.\n\nThank you for using the Business Diagnostic Tool!');
                 } else {
                     alert('⚠️ There was an issue sending your results.\n\nPlease contact jason@cfib-durham.ca directly or try the "Schedule My Recovery Call" button above.');
@@ -352,7 +362,220 @@
             .catch(error => {
                 // Even if there's a CORS or network error, the form likely still submitted
                 console.log('Fetch completed:', error);
+                generateAndSendPDF(); // Still send PDF
                 alert('✅ Results sent to CFIB Durham!\n\nWe\'ll email you a detailed breakdown within 24 hours.\n\nThank you for using the Business Diagnostic Tool!');
+            });
+        }
+        
+        function generateAndSendPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const result = window.currentResult;
+            const data = window.currentData;
+            const totalRecovery = window.totalRecovery;
+            const membershipCost = window.membershipCost;
+            const taxSavings = window.taxSavings;
+            const afterTaxCost = window.afterTaxCost;
+            const netGain = window.netGain;
+            
+            // Page settings
+            const pageWidth = doc.internal.pageSize.width;
+            const margin = 20;
+            let y = 20;
+            
+            // Header - CFIB Branding
+            doc.setFontSize(24);
+            doc.setTextColor(211, 17, 69);
+            doc.setFont(undefined, 'bold');
+            doc.text('CFIB Durham Region', margin, y);
+            
+            y += 8;
+            doc.setFontSize(12);
+            doc.setTextColor(100, 100, 100);
+            doc.setFont(undefined, 'normal');
+            doc.text('Business Recovery Plan Summary', margin, y);
+            
+            y += 15;
+            
+            // Business Info
+            doc.setFontSize(14);
+            doc.setTextColor(37, 75, 135);
+            doc.setFont(undefined, 'bold');
+            doc.text('Business Information', margin, y);
+            
+            y += 7;
+            doc.setFontSize(10);
+            doc.setTextColor(50, 50, 50);
+            doc.setFont(undefined, 'normal');
+            doc.text(`Business Name: ${data.businessName || 'N/A'}`, margin, y);
+            y += 5;
+            doc.text(`Location: ${data.cityLocation || 'N/A'}`, margin, y);
+            y += 5;
+            doc.text(`Employees: ${data.employees}`, margin, y);
+            y += 5;
+            doc.text(`Industry: ${data.industry || 'N/A'}`, margin, y);
+            y += 12;
+            
+            // Protection Score
+            doc.setFontSize(14);
+            doc.setTextColor(37, 75, 135);
+            doc.setFont(undefined, 'bold');
+            doc.text('Protection Score Assessment', margin, y);
+            
+            y += 7;
+            doc.setFontSize(24);
+            const scoreColor = result.score < 40 ? [211, 17, 69] : result.score < 76 ? [243, 146, 0] : [32, 170, 63];
+            doc.setTextColor(...scoreColor);
+            doc.text(`${result.score}/100`, margin, y);
+            
+            y += 7;
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            const scoreLabel = result.score < 40 ? 'HIGHLY VULNERABLE' : result.score < 76 ? 'ACTION RECOMMENDED' : 'STRONG COVERAGE';
+            doc.text(scoreLabel, margin, y);
+            y += 12;
+            
+            // Vulnerabilities
+            if (result.vulnerabilities.length > 0) {
+                doc.setFontSize(14);
+                doc.setTextColor(37, 75, 135);
+                doc.setFont(undefined, 'bold');
+                doc.text('Identified Vulnerabilities', margin, y);
+                
+                y += 7;
+                doc.setFontSize(9);
+                doc.setTextColor(50, 50, 50);
+                doc.setFont(undefined, 'normal');
+                
+                result.vulnerabilities.forEach((vuln, index) => {
+                    if (y > 270) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                    
+                    doc.setFont(undefined, 'bold');
+                    doc.text(`${index + 1}. ${vuln.title}`, margin + 3, y);
+                    y += 5;
+                    
+                    doc.setFont(undefined, 'normal');
+                    const impactLines = doc.splitTextToSize(vuln.impact, pageWidth - margin * 2 - 6);
+                    doc.text(impactLines, margin + 6, y);
+                    y += (impactLines.length * 4) + 2;
+                    
+                    doc.setFont(undefined, 'bold');
+                    doc.text(`Cost: ${vuln.cost}`, margin + 6, y);
+                    y += 7;
+                });
+                y += 5;
+            }
+            
+            // Recovery Actions
+            if (y > 220) {
+                doc.addPage();
+                y = 20;
+            }
+            
+            if (result.recoveryActions.length > 0) {
+                doc.setFontSize(14);
+                doc.setTextColor(37, 75, 135);
+                doc.setFont(undefined, 'bold');
+                doc.text('Recovery Actions', margin, y);
+                
+                y += 7;
+                doc.setFontSize(9);
+                doc.setTextColor(50, 50, 50);
+                doc.setFont(undefined, 'normal');
+                
+                result.recoveryActions.forEach((action, index) => {
+                    if (y > 250) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                    
+                    doc.setFont(undefined, 'bold');
+                    doc.text(`${index + 1}. ${action.title}`, margin + 3, y);
+                    y += 5;
+                    
+                    doc.setFont(undefined, 'normal');
+                    const descLines = doc.splitTextToSize(action.description, pageWidth - margin * 2 - 6);
+                    doc.text(descLines, margin + 6, y);
+                    y += (descLines.length * 4) + 2;
+                    
+                    const benefitLines = doc.splitTextToSize(action.benefit, pageWidth - margin * 2 - 6);
+                    doc.text(benefitLines, margin + 6, y);
+                    y += (benefitLines.length * 4) + 2;
+                    
+                    doc.setFont(undefined, 'bold');
+                    doc.setTextColor(32, 170, 63);
+                    doc.text(`Annual Recovery: $${action.value.toLocaleString()}`, margin + 6, y);
+                    doc.setTextColor(50, 50, 50);
+                    y += 8;
+                });
+                y += 5;
+            }
+            
+            // Financial Summary
+            if (y > 200) {
+                doc.addPage();
+                y = 20;
+            }
+            
+            doc.setFontSize(14);
+            doc.setTextColor(37, 75, 135);
+            doc.setFont(undefined, 'bold');
+            doc.text('Financial Summary', margin, y);
+            
+            y += 10;
+            doc.setFontSize(10);
+            doc.setTextColor(50, 50, 50);
+            doc.setFont(undefined, 'normal');
+            
+            doc.text('Total Annual Recovery:', margin, y);
+            doc.setFont(undefined, 'bold');
+            doc.text(`$${totalRecovery.toLocaleString()}`, pageWidth - margin - 40, y);
+            
+            y += 7;
+            doc.setFont(undefined, 'normal');
+            doc.text('Membership Investment:', margin, y);
+            doc.text(`$${membershipCost.toLocaleString()}/year`, pageWidth - margin - 40, y);
+            
+            y += 7;
+            doc.setTextColor(32, 170, 63);
+            doc.text('Tax Deduction (30% bracket):', margin, y);
+            doc.text(`-$${taxSavings.toLocaleString()}`, pageWidth - margin - 40, y);
+            
+            y += 7;
+            doc.setTextColor(50, 50, 50);
+            doc.text('After-Tax Cost:', margin, y);
+            doc.text(`$${afterTaxCost.toLocaleString()}/year`, pageWidth - margin - 40, y);
+            
+            y += 10;
+            doc.setDrawColor(200, 200, 200);
+            doc.line(margin, y, pageWidth - margin, y);
+            
+            y += 7;
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('Net Annual Gain:', margin, y);
+            doc.setTextColor(32, 170, 63);
+            doc.setFontSize(14);
+            doc.text(`$${netGain.toLocaleString()}`, pageWidth - margin - 40, y);
+            
+            // Convert PDF to base64
+            const pdfBase64 = doc.output('datauristring').split(',')[1];
+            
+            // Send via EmailJS
+            emailjs.send('service_mo8hrih', 'template_wd6kpbp', {
+                business_name: data.businessName || 'N/A',
+                city_location: data.cityLocation || 'N/A',
+                protection_score: `${result.score}/100`,
+                pdf_attachment: pdfBase64
+            })
+            .then(function(response) {
+                console.log('PDF sent successfully via EmailJS', response.status, response.text);
+            }, function(error) {
+                console.error('EmailJS failed to send PDF:', error);
             });
         }
     </script>
