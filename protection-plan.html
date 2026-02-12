@@ -323,17 +323,22 @@
                 '---': '--- VULNERABILITIES ---'
             };
             
-            // Add each vulnerability as a separate field
+            // Add each vulnerability as 3 separate fields (Title, Impact, Cost)
             result.vulnerabilities.forEach((vuln, index) => {
-                formData[`Vulnerability ${index + 1}`] = `${vuln.title} | Impact: ${vuln.impact} | Cost: ${vuln.cost}`;
+                formData[`Vulnerability ${index + 1} - Title`] = vuln.title;
+                formData[`Vulnerability ${index + 1} - Impact`] = vuln.impact;
+                formData[`Vulnerability ${index + 1} - Cost`] = vuln.cost;
             });
             
             formData['  '] = '';  // Blank spacing
             formData['----'] = '--- RECOVERY ACTIONS ---';
             
-            // Add each recovery action as a separate field
+            // Add each recovery action as 4 separate fields (Title, Value, Description, Benefit)
             result.recoveryActions.forEach((action, index) => {
-                formData[`Recovery ${index + 1}`] = `${action.title} | Value: $${action.value.toLocaleString()}/year | Description: ${action.description} | Benefit: ${action.benefit}`;
+                formData[`Recovery ${index + 1} - Title`] = action.title;
+                formData[`Recovery ${index + 1} - Value`] = `$${action.value.toLocaleString()}/year`;
+                formData[`Recovery ${index + 1} - Description`] = action.description;
+                formData[`Recovery ${index + 1} - Benefit`] = action.benefit;
             });
             
             formData['   '] = '';  // Blank spacing
@@ -566,7 +571,7 @@
             const pdfBase64 = doc.output('datauristring').split(',')[1];
             
             // Send via EmailJS
-            emailjs.send('service_mo8hrih', 'template_wd6kpbp', {
+            emailjs.send('service_o6x7g6n', 'template_wd6kpbp', {
                 business_name: data.businessName || 'N/A',
                 city_location: data.cityLocation || 'N/A',
                 protection_score: `${result.score}/100`,
