@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Business Recovery Plan | CFIB Durham</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Montserrat', sans-serif; background-color: #f4f7f9; min-height: 100vh; padding: 20px; }
+        .header { text-align: center; padding: 20px 0 30px 0; max-width: 1000px; margin: 0 auto; }
+        .header h1 { color: #D31145; font-size: 32px; font-weight: 700; margin-bottom: 10px; }
+        .header p { color: #656465; font-size: 18px; }
+        .back-link { display: inline-block; color: #254B87; text-decoration: none; margin-bottom: 20px; font-weight: 600; font-size: 14px; }
+        .back-link:hover { color: #D31145; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        .protection-score-section { background: linear-gradient(135deg, #254B87 0%, #D31145 100%); color: white; padding: 50px 40px; border-radius: 16px; text-align: center; margin-bottom: 40px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+        .protection-score-section h2 { font-size: 24px; font-weight: 600; margin-bottom: 20px; opacity: 0.95; letter-spacing: 1px; }
+        .score-display { font-size: 96px; font-weight: 700; margin-bottom: 30px; text-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .score-gauge { width: 100%; max-width: 500px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 20px; margin: 0 auto 30px; overflow: hidden; position: relative; }
+        .score-gauge-fill { height: 100%; border-radius: 20px; transition: width 1s ease, background 1s ease; }
+        .score-label { font-size: 22px; font-weight: 700; margin-top: 15px; letter-spacing: 1px; }
+        .score-interpretation { font-size: 16px; opacity: 0.95; margin-top: 15px; line-height: 1.6; max-width: 700px; margin-left: auto; margin-right: auto; }
+        
+        .vulnerabilities-section { background: white; padding: 40px; border-radius: 16px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .vulnerabilities-section h3 { color: #D31145; font-size: 26px; font-weight: 700; margin-bottom: 25px; text-align: center; }
+        .vulnerability-item { display: flex; align-items: flex-start; gap: 20px; padding: 20px; margin-bottom: 15px; background: #fff5f7; border-radius: 12px; border-left: 5px solid #D31145; }
+        .vulnerability-item .icon { font-size: 32px; flex-shrink: 0; }
+        .vulnerability-item .content { flex: 1; }
+        .vulnerability-item .title { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 8px; }
+        .vulnerability-item .impact { font-size: 15px; color: #656465; line-height: 1.5; }
+        .vulnerability-item .cost { font-size: 24px; font-weight: 700; color: #D31145; margin-top: 10px; }
+        
+        .recovery-section { background: linear-gradient(135deg, #20AA3F 0%, #178a32 100%); color: white; padding: 50px 40px; border-radius: 16px; margin-bottom: 30px; box-shadow: 0 8px 24px rgba(32,170,63,0.3); }
+        .recovery-section h3 { font-size: 32px; font-weight: 700; margin-bottom: 15px; text-align: center; }
+        .recovery-section .subtitle { font-size: 18px; opacity: 0.95; margin-bottom: 40px; text-align: center; }
+        
+        .recovery-action { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 30px; border-radius: 12px; margin-bottom: 20px; border-left: 5px solid white; }
+        .recovery-action .action-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .recovery-action .action-icon { font-size: 36px; }
+        .recovery-action .action-title { font-size: 22px; font-weight: 700; }
+        .recovery-action .action-description { font-size: 16px; line-height: 1.6; margin-bottom: 15px; opacity: 0.95; }
+        .recovery-action .action-benefit { background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; font-size: 15px; line-height: 1.5; }
+        .recovery-action .action-benefit strong { display: block; margin-bottom: 5px; font-size: 16px; }
+        .recovery-action .recovery-value { font-size: 32px; font-weight: 700; color: #fff; margin-top: 10px; }
+        
+        .total-recovery { background: white; color: #20AA3F; padding: 40px; border-radius: 16px; text-align: center; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .total-recovery h3 { color: #254B87; font-size: 22px; font-weight: 600; margin-bottom: 15px; }
+        .total-recovery .big-number { font-size: 64px; font-weight: 700; }
+        .total-recovery .comparison { font-size: 18px; color: #656465; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; }
+        
+        .next-steps { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .next-steps h3 { color: #254B87; font-size: 28px; font-weight: 700; margin-bottom: 25px; text-align: center; }
+        .next-steps .cta-text { font-size: 17px; line-height: 1.7; color: #333; margin-bottom: 30px; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        
+        .cta-buttons { display: flex; gap: 20px; justify-content: center; margin-top: 30px; flex-wrap: wrap; }
+        .cta-btn { padding: 18px 35px; border-radius: 10px; font-size: 18px; font-weight: 700; text-decoration: none; transition: all 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .cta-btn-primary { background: #D31145; color: white; }
+        .cta-btn-primary:hover { background: #254B87; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
+        .cta-btn-secondary { background: white; color: #254B87; border: 3px solid #254B87; }
+        .cta-btn-secondary:hover { background: #254B87; color: white; transform: translateY(-2px); }
+        
+        .no-data-message { text-align: center; padding: 60px 40px; background: white; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .no-data-message h2 { color: #254B87; font-size: 28px; margin-bottom: 20px; }
+        .no-data-message p { color: #656465; font-size: 18px; margin-bottom: 30px; }
+        .no-data-message a { display: inline-block; background: #D31145; color: white; padding: 18px 35px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 18px; }
+        
+        @media (max-width: 768px) {
+            .header h1 { font-size: 26px; }
+            .score-display { font-size: 72px; }
+            .vulnerabilities-section, .recovery-section, .next-steps { padding: 30px 25px; }
+            .recovery-action { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="calculator.html" class="back-link">← Back to Calculator</a>
+        <h1>Your Business Recovery Plan</h1>
+        <p>Here's exactly how we'll help you recover those dollars</p>
+    </div>
+    
+    <div class="container" id="mainContent"></div>
+    
+    <script>
+        const PROTECTION_ALGORITHM = {
+            WEIGHTS: { MERCHANT_GAP: 10, HR_LEGAL_GAP: 15, PAYROLL_GAP: 10, TAX_REBATE_GAP: 10, TIME_POVERTY: 10, ADVOCACY_GAP: 5 },
+            
+            calculateScore: function(data) {
+                let score = 100;
+                const vulnerabilities = [];
+                const recoveryActions = [];
+                
+                if (data.cardVolume !== '' && data.cardVolume !== 'none') {
+                    score -= this.WEIGHTS.MERCHANT_GAP;
+                    const saving = data.cardVolume === 'above' ? 2000 : 600; // Conservative
+                    vulnerabilities.push({ icon: '💳', title: 'Merchant Fee Gap', impact: 'Overpaying on credit card processing with flat or tiered pricing structure.', cost: `$${saving.toLocaleString()}/year` });
+                    recoveryActions.push({ icon: '💰', title: 'Payment Processing Optimization', description: 'Switch to CFIB/Chase Partnership with interchange-plus pricing model.', benefit: 'Recover the margin between your current rates and the negotiated interchange-plus model — typically 0.6% savings on total card volume.', value: saving });
+                }
+                
+                if (data.hrConfidence <= 5 || data.legalEvents === 0) {
+                    score -= this.WEIGHTS.HR_LEGAL_GAP;
+                    vulnerabilities.push({ icon: '⚖️', title: 'HR/Legal Compliance Gap', impact: 'Outdated or missing employment contracts, handbooks, and policies expose you to Ministry of Labour disputes.', cost: 'Potential $10,000+ liability' });
+                    recoveryActions.push({ icon: '🛡️', title: 'HR Now! Protection Shield', description: 'Deploy CFIB HR Document Library and unlimited Business Advisor access.', benefit: 'Instant access to Ontario-compliant templates and expert advice to stop a $300/hour lawyer bill before it starts. Includes employment contracts, termination letters, health & safety policies.', value: 1400 });
+                }
+                
+                if (data.payrollMethod === 'manual' || data.payrollMethod === 'bank') {
+                    score -= this.WEIGHTS.PAYROLL_GAP;
+                    const saving = 300 + (data.employees * 40); // Conservative
+                    vulnerabilities.push({ icon: '📊', title: 'Payroll & Admin Inefficiency', impact: 'Manual or inefficient payroll processing wastes time and money.', cost: `$${saving.toLocaleString()}/year` });
+                    recoveryActions.push({ icon: '⚡', title: 'Payworks Automation', description: '40% discount on automated payroll services through CFIB partnership.', benefit: 'Eliminate manual calculations, automate direct deposits, T4s, and ROE filings. Reclaim 3-5 hours per pay period and reduce errors that trigger CRA audits.', value: saving });
+                }
+                
+                if (data.businessStructure === 'soleproprietor' && data.employees > 0) {
+                    score -= this.WEIGHTS.TAX_REBATE_GAP;
+                    const carbonLoss = data.employees * 98;
+                    vulnerabilities.push({ icon: '🏢', title: 'Corporate Structure Gap', impact: `As a Sole Proprietor, you're excluded from the Canada Carbon Rebate ($${carbonLoss}/year).`, cost: `$${carbonLoss.toLocaleString()}/year lost` });
+                    recoveryActions.push({ icon: '📈', title: 'Incorporation Strategy', description: 'Strategic roadmap to move to 12.2% corporate tax rate and unlock federal rebates.', benefit: `Schedule a CFIB Advisor call to analyze incorporation pros/cons. Potential to unlock $${carbonLoss.toLocaleString()} annually in Canada Carbon Rebates.`, value: carbonLoss });
+                }
+                
+                if (data.adminHours >= 5) {
+                    score -= this.WEIGHTS.TIME_POVERTY;
+                    const timeValue = data.adminHours * 52 * 75;
+                    vulnerabilities.push({ icon: '⏰', title: 'Time Poverty', impact: `Spending ${data.adminHours} hours/week on compliance and admin paperwork instead of revenue-generating activities.`, cost: `${data.adminHours * 52} hours/year (worth $${timeValue.toLocaleString()})` });
+                    recoveryActions.push({ icon: '🚀', title: 'Time Recovery System', description: 'Offload compliance, HR, and admin to CFIB resources and automation tools.', benefit: `By using Payworks automation, HR templates, and on-demand advisors, reclaim ${data.adminHours} hours/week. Redirect that time to sales, strategy, or family — worth $${timeValue.toLocaleString()} annually.`, value: timeValue });
+                }
+                
+                if (data.employees > 0) {
+                    score -= this.WEIGHTS.ADVOCACY_GAP;
+                    const wsibSurplus = data.employees * 250; // $250 per employee
+                    const carbonRebate = data.employees * 98;
+                    const totalAdvocacyValue = wsibSurplus + carbonRebate;
+                    
+                    vulnerabilities.push({ icon: '📢', title: 'Advocacy Gap', impact: 'Fighting tax hikes, WSIB increases, and regulatory changes alone without 100,000 voices backing you.', cost: 'Unquantified risk' });
+                    recoveryActions.push({ icon: '🏛️', title: 'CFIB Advocacy Power', description: '100,000 members. One powerful voice at Queen\'s Park and Ottawa.', benefit: `Recent wins: $${wsibSurplus.toLocaleString()} WSIB Surplus rebate (2026 - $250/employee), Canada Carbon Rebate ($${carbonRebate.toLocaleString()}), Red Tape reduction saving businesses 40+ hours/year. Your membership funds the research and lobbying that protects your bottom line.`, value: totalAdvocacyValue });
+                }
+                
+                return { score: Math.max(0, Math.min(100, score)), vulnerabilities, recoveryActions };
+            }
+        };
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedData = localStorage.getItem('cfib_calculator_data');
+            
+            console.log('Protection Plan - Saved Data:', savedData); // Debug
+            
+            if (!savedData) {
+                document.getElementById('mainContent').innerHTML = `<div class="no-data-message"><h2>Complete the ROI Calculator First</h2><p>To generate your personalized recovery plan, we need to analyze your business vulnerabilities.</p><a href="calculator.html">Go to ROI Calculator →</a></div>`;
+                return;
+            }
+            
+            const data = JSON.parse(savedData);
+            console.log('Protection Plan - Parsed Data:', data); // Debug
+            
+            const result = PROTECTION_ALGORITHM.calculateScore(data);
+            console.log('Protection Plan - Calculated Result:', result); // Debug
+            
+            generateRecoveryPlan(result, data);
+        });
+        
+        function generateRecoveryPlan(result, data) {
+            console.log('Generating Recovery Plan - Result:', result, 'Data:', data); // Debug
+            
+            // If no vulnerabilities or recovery actions, show error
+            if (result.vulnerabilities.length === 0 && result.recoveryActions.length === 0) {
+                document.getElementById('mainContent').innerHTML = `
+                    <div class="no-data-message">
+                        <h2>No Vulnerabilities Detected</h2>
+                        <p>Based on your responses, you appear to have excellent coverage already!</p>
+                        <p>However, this might indicate incomplete calculator data. Please go back and ensure all fields are filled out.</p>
+                        <a href="calculator.html">← Back to Calculator</a>
+                    </div>`;
+                return;
+            }
+            
+            let scoreColor, scoreLabel, scoreMessage;
+            if (result.score < 40) {
+                scoreColor = '#D31145'; scoreLabel = 'HIGHLY VULNERABLE'; scoreMessage = 'Your business is exposed to significant operational and financial risks. Immediate action is critical.';
+            } else if (result.score < 76) {
+                scoreColor = '#f39200'; scoreLabel = 'ACTION RECOMMENDED'; scoreMessage = 'You have coverage in some areas, but critical gaps are costing you money and exposing you to risk.';
+            } else {
+                scoreColor = '#20AA3F'; scoreLabel = 'STRONG COVERAGE'; scoreMessage = 'You\'re in better shape than most, but there are still opportunities to optimize and protect.';
+            }
+            
+            const totalRecovery = result.recoveryActions
+                .filter(action => action.title !== 'Time Recovery System')
+                .reduce((sum, action) => sum + action.value, 0);
+            const membershipCost = (34 + (data.employees * 3)) * 12;
+            const taxSavings = Math.round(membershipCost * 0.30); // 30% tax bracket
+            const afterTaxCost = membershipCost - taxSavings;
+            const netGain = totalRecovery - afterTaxCost;
+            
+            let html = `<div class="protection-score-section"><h2>YOUR BUSINESS PROTECTION SCORE</h2><div class="score-display">${result.score}/100</div><div class="score-gauge"><div class="score-gauge-fill" style="width: ${result.score}%; background: ${scoreColor};"></div></div><div class="score-label">${scoreLabel}</div><div class="score-interpretation">${scoreMessage}</div></div>`;
+            
+            if (result.vulnerabilities.length > 0) {
+                html += `<div class="vulnerabilities-section"><h3>🚨 Identified Vulnerabilities</h3>`;
+                result.vulnerabilities.forEach(vuln => {
+                    html += `<div class="vulnerability-item"><div class="icon">${vuln.icon}</div><div class="content"><div class="title">${vuln.title}</div><div class="impact">${vuln.impact}</div><div class="cost">${vuln.cost}</div></div></div>`;
+                });
+                html += `</div>`;
+            }
+            
+            html += `<div class="recovery-section"><h3>✅ Your Recovery Roadmap</h3><div class="subtitle">Here's exactly how CFIB will help you recover these dollars</div>`;
+            result.recoveryActions.forEach(action => {
+                html += `<div class="recovery-action"><div class="action-header"><div class="action-icon">${action.icon}</div><div class="action-title">${action.title}</div></div><div class="action-description">${action.description}</div><div class="action-benefit"><strong>Direct Benefit:</strong> ${action.benefit}</div><div class="recovery-value">Recovery: $${action.value.toLocaleString()}/year</div></div>`;
+            });
+            html += `</div>`;
+            
+            html += `<div class="total-recovery"><h3>TOTAL ANNUAL RECOVERY POTENTIAL</h3><div class="big-number">$${totalRecovery.toLocaleString()}</div><div class="comparison">
+                <strong>Your Investment:</strong> $${membershipCost.toLocaleString()}/year ($${Math.round(membershipCost/12)}/month)<br>
+                <div style="margin: 10px 0; padding: 10px; background: rgba(32,170,63,0.1); border-radius: 6px; border-left: 3px solid #20AA3F;">
+                    <strong style="color: #20AA3F;">💰 100% Tax Deductible</strong><br>
+                    <span style="font-size: 15px;">Tax savings (30% bracket): -$${taxSavings}<br>
+                    Real after-tax cost: $${afterTaxCost}/year</span>
+                </div>
+                <strong>Net Gain (after tax):</strong> <span style="color: #20AA3F; font-size: 24px; font-weight: 700;">$${netGain.toLocaleString()}</span>
+            </div></div>`;
+            
+            // Calculate projected score after recovery
+            const projectedScore = Math.min(95, result.score + 45); // Recovery can add up to 45 points
+            const currentRiskLevel = result.score < 40 ? 'Highly Vulnerable' : result.score < 76 ? 'At Risk' : 'Strong';
+            
+            // Build transformation statement
+            let transformStatement = `<div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 30px; border-radius: 12px; margin-bottom: 30px; border-left: 5px solid #254B87;">
+                <h4 style="color: #254B87; font-size: 22px; font-weight: 700; margin-bottom: 20px; text-align: center;">Your Transformation Roadmap</h4>
+                <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: center; max-width: 800px; margin: 0 auto;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 14px; color: #656465; margin-bottom: 8px; font-weight: 600;">CURRENT STATE</div>
+                        <div style="font-size: 48px; font-weight: 700; color: #D31145; margin-bottom: 5px;">${result.score}/100</div>
+                        <div style="font-size: 16px; color: #656465; font-weight: 600;">${currentRiskLevel}</div>
+                        <div style="margin-top: 15px; font-size: 14px; color: #333; line-height: 1.5;">
+                            Currently losing <strong style="color: #D31145;">$${totalRecovery.toLocaleString()}</strong> to operational leaks`;
+            
+            // Add HR liability mention if applicable
+            const hasHRGap = result.vulnerabilities.some(v => v.title === 'HR/Legal Compliance Gap');
+            if (hasHRGap) {
+                transformStatement += ` and exposed to <strong style="color: #D31145;">$10,000+</strong> in potential HR liabilities`;
+            }
+            
+            transformStatement += `.</div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <div style="font-size: 32px; color: #20AA3F;">→</div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <div style="font-size: 14px; color: #656465; margin-bottom: 8px; font-weight: 600;">WITH CFIB</div>
+                        <div style="font-size: 48px; font-weight: 700; color: #20AA3F; margin-bottom: 5px;">${projectedScore}/100</div>
+                        <div style="font-size: 16px; color: #20AA3F; font-weight: 600;">Protected</div>
+                        <div style="margin-top: 15px; font-size: 14px; color: #333; line-height: 1.5;">
+                            Recovery plan implemented, money back in your pocket, HR protection in place.
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 25px; padding-top: 25px; border-top: 2px solid #d0d0d0;">
+                    <p style="font-size: 17px; color: #333; line-height: 1.6; margin-bottom: 10px;">
+                        <strong>For a membership investment of $${Math.round(membershipCost/12)}/month</strong> (just $${Math.round(afterTaxCost/12)}/month after tax deduction), we can implement the Recovery Plan above, moving your score to ${projectedScore}+ and putting that money back where it belongs—<strong style="color: #20AA3F;">in your business</strong>.
+                    </p>
+                    <p style="font-size: 14px; color: #656465; font-style: italic;">
+                        As a registered non-profit, CFIB memberships are 100% tax-deductible business expenses.
+                    </p>
+                </div>
+            </div>`;
+            
+            html += transformStatement;
+            
+            const ctaMessage = result.score < 40 
+                ? `Your Protection Score of ${result.score}/100 indicates serious vulnerability. The good news? We've identified exactly how to fix it. I can walk you through this roadmap in 15 minutes and show you how to activate these solutions. Are you available Tuesday at 10:00 AM?`
+                : result.score < 76
+                ? `You're not in crisis, but you're at risk. The Recovery Plan above closes your gaps and moves you to ${projectedScore}/100. The membership pays for itself in under 3 months. Should we activate your profile this week?`
+                : `Even with a strong score of ${result.score}/100, we've found opportunities to optimize to ${projectedScore}/100. Let's lock in these protections and savings. Ready to activate?`;
+            
+            html += `<div class="next-steps"><h3>The Brutally Honest Next Steps</h3><div class="cta-text">${ctaMessage}</div><div class="cta-buttons"><a href="mailto:jason@cfib-durham.ca?subject=Recovery Plan - Protection Score ${result.score}" class="cta-btn cta-btn-primary">📧 Schedule My Recovery Call</a><button onclick="downloadAndEmailResults()" class="cta-btn cta-btn-secondary" style="border: none;">📄 Download PDF</button><a href="index.html" class="cta-btn cta-btn-secondary">🔄 Start Over</a></div></div>`;
+            
+            document.getElementById('mainContent').innerHTML = html;
+            
+            // Store for PDF generation
+            window.currentResult = result;
+            window.currentData = data;
+            window.totalRecovery = totalRecovery;
+            window.membershipCost = membershipCost;
+            window.taxSavings = taxSavings;
+            window.afterTaxCost = afterTaxCost;
+            window.netGain = netGain;
+        }
+        
+        function downloadAndEmailResults() {
+            const result = window.currentResult;
+            const data = window.currentData;
+            const totalRecovery = window.totalRecovery;
+            const membershipCost = window.membershipCost;
+            const taxSavings = window.taxSavings;
+            const afterTaxCost = window.afterTaxCost;
+            const netGain = window.netGain;
+            
+            // First, submit to Formspark (sends email to you)
+            submitToFormspark(result, data, totalRecovery, membershipCost, taxSavings, afterTaxCost, netGain);
+            
+            // Then, generate and download PDF for user
+            downloadPDF(result, data, totalRecovery, membershipCost, taxSavings, afterTaxCost, netGain);
+        }
+        
+        function submitToFormspark(result, data, totalRecovery, membershipCost, taxSavings, afterTaxCost, netGain) {
+            // Build Legal Health Check summary
+            const legalChecks = [];
+            if (data.legalEventDetails?.employment) legalChecks.push('Employment Issues');
+            if (data.legalEventDetails?.policy) legalChecks.push('Policy Review');
+            if (data.legalEventDetails?.contract) legalChecks.push('Contract Disputes');
+            if (data.legalEventDetails?.advice) legalChecks.push('Legal Advice');
+            const legalHealthCheck = legalChecks.length > 0 ? legalChecks.join(', ') : 'None selected';
+            
+            // Build business information as a single field
+            const businessInfo = `Business Name: ${data.businessName || 'N/A'}
+City/Location: ${data.cityLocation || 'N/A'}
+Employees: ${data.employees || 0}
+Industry: ${data.industry || 'N/A'}
+Business Structure: ${data.businessStructure || 'N/A'}
+Pain Point: ${data.painPoint || 'Not selected'}
+Legal Health Check: ${legalHealthCheck}`;
+
+            // Build financial summary as a single field
+            const financialSummary = `Protection Score: ${result.score}/100
+Total Recovery: $${totalRecovery.toLocaleString()}
+Membership Cost: $${membershipCost.toLocaleString()}/year
+Tax Deduction: $${taxSavings.toLocaleString()}
+After-Tax Cost: $${afterTaxCost.toLocaleString()}/year
+Net Annual Gain: $${netGain.toLocaleString()}`;
+            
+            // Build plain text formatted vulnerabilities as a single field
+            let vulnerabilitiesContent = '';
+            result.vulnerabilities.forEach((vuln, index) => {
+                vulnerabilitiesContent += `${index + 1}. ${vuln.title}\n`;
+                vulnerabilitiesContent += `   Impact: ${vuln.impact}\n`;
+                vulnerabilitiesContent += `   Cost: ${vuln.cost}\n\n`;
+            });
+            
+            // Build plain text formatted recovery actions as a single field
+            let recoveryContent = '';
+            result.recoveryActions.forEach((action, index) => {
+                recoveryContent += `${index + 1}. ${action.title} - $${action.value.toLocaleString()}/year\n`;
+                recoveryContent += `   Description: ${action.description}\n`;
+                recoveryContent += `   Benefit: ${action.benefit}\n\n`;
+            });
+            
+            // Prepare form data for FormSubmit with individual fields
+            const formData = {
+                _subject: `🎯 Protection Plan Results - ${data.businessName || 'Business'} (Score: ${result.score}/100)`,
+                _captcha: 'false',
+                _template: 'basic',
+                'Business Information': businessInfo,
+                'Financial Summary': financialSummary,
+                'Vulnerabilities': vulnerabilitiesContent,
+                'Recovery Actions': recoveryContent,
+                'Timestamp': new Date().toLocaleString()
+            };
+            
+            // Submit to FormSubmit (sends to jasoncfib@gmail.com)
+            fetch('https://formsubmit.co/jasoncfib@gmail.com', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('FormSubmit submission successful');
+            })
+            .catch(error => {
+                console.log('FormSubmit submission completed:', error);
+            });
+        }
+        
+        function downloadPDF(result, data, totalRecovery, membershipCost, taxSavings, afterTaxCost, netGain) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Page settings
+            const pageWidth = doc.internal.pageSize.width;
+            const margin = 20;
+            let y = 20;
+            
+            // Header - CFIB Branding
+            doc.setFontSize(24);
+            doc.setTextColor(211, 17, 69);
+            doc.setFont(undefined, 'bold');
+            doc.text('CFIB Durham Region', margin, y);
+            
+            y += 8;
+            doc.setFontSize(12);
+            doc.setTextColor(100, 100, 100);
+            doc.setFont(undefined, 'normal');
+            doc.text('Business Recovery Plan Summary', margin, y);
+            
+            y += 15;
+            
+            // Business Info
+            doc.setFontSize(14);
+            doc.setTextColor(37, 75, 135);
+            doc.setFont(undefined, 'bold');
+            doc.text('Business Information', margin, y);
+            
+            y += 7;
+            doc.setFontSize(10);
+            doc.setTextColor(50, 50, 50);
+            doc.setFont(undefined, 'normal');
+            doc.text(`Business Name: ${data.businessName || 'N/A'}`, margin, y);
+            y += 5;
+            doc.text(`Location: ${data.cityLocation || 'N/A'}`, margin, y);
+            y += 5;
+            doc.text(`Employees: ${data.employees}`, margin, y);
+            y += 5;
+            doc.text(`Industry: ${data.industry || 'N/A'}`, margin, y);
+            y += 5;
+            doc.text(`Pain Point: ${data.painPoint || 'Not selected'}`, margin, y);
+            y += 5;
+            
+            // Legal Health Check
+            const legalChecks = [];
+            if (data.legalEventDetails?.employment) legalChecks.push('Employment Issues');
+            if (data.legalEventDetails?.policy) legalChecks.push('Policy Review');
+            if (data.legalEventDetails?.contract) legalChecks.push('Contract Disputes');
+            if (data.legalEventDetails?.advice) legalChecks.push('Legal Advice');
+            doc.text(`Legal Health Check: ${legalChecks.length > 0 ? legalChecks.join(', ') : 'None selected'}`, margin, y);
+            y += 12;
+            
+            // Protection Score
+            doc.setFontSize(14);
+            doc.setTextColor(37, 75, 135);
+            doc.setFont(undefined, 'bold');
+            doc.text('Protection Score Assessment', margin, y);
+            
+            y += 7;
+            doc.setFontSize(24);
+            const scoreColor = result.score < 40 ? [211, 17, 69] : result.score < 76 ? [243, 146, 0] : [32, 170, 63];
+            doc.setTextColor(...scoreColor);
+            doc.text(`${result.score}/100`, margin, y);
+            
+            y += 7;
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            const scoreLabel = result.score < 40 ? 'HIGHLY VULNERABLE' : result.score < 76 ? 'ACTION RECOMMENDED' : 'STRONG COVERAGE';
+            doc.text(scoreLabel, margin, y);
+            y += 12;
+            
+            // Vulnerabilities
+            if (result.vulnerabilities.length > 0) {
+                doc.setFontSize(14);
+                doc.setTextColor(37, 75, 135);
+                doc.setFont(undefined, 'bold');
+                doc.text('Identified Vulnerabilities', margin, y);
+                
+                y += 7;
+                doc.setFontSize(9);
+                doc.setTextColor(50, 50, 50);
+                doc.setFont(undefined, 'normal');
+                
+                result.vulnerabilities.forEach((vuln, index) => {
+                    if (y > 270) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                    
+                    doc.setFont(undefined, 'bold');
+                    doc.text(`${index + 1}. ${vuln.title}`, margin + 3, y);
+                    y += 5;
+                    
+                    doc.setFont(undefined, 'normal');
+                    const impactLines = doc.splitTextToSize(vuln.impact, pageWidth - margin * 2 - 6);
+                    doc.text(impactLines, margin + 6, y);
+                    y += (impactLines.length * 4) + 2;
+                    
+                    doc.setFont(undefined, 'bold');
+                    doc.text(`Cost: ${vuln.cost}`, margin + 6, y);
+                    y += 7;
+                });
+                y += 5;
+            }
+            
+            // Recovery Actions
+            if (y > 220) {
+                doc.addPage();
+                y = 20;
+            }
+            
+            if (result.recoveryActions.length > 0) {
+                doc.setFontSize(14);
+                doc.setTextColor(37, 75, 135);
+                doc.setFont(undefined, 'bold');
+                doc.text('Recovery Actions', margin, y);
+                
+                y += 7;
+                doc.setFontSize(9);
+                doc.setTextColor(50, 50, 50);
+                doc.setFont(undefined, 'normal');
+                
+                result.recoveryActions.forEach((action, index) => {
+                    if (y > 250) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                    
+                    doc.setFont(undefined, 'bold');
+                    doc.text(`${index + 1}. ${action.title}`, margin + 3, y);
+                    y += 5;
+                    
+                    doc.setFont(undefined, 'normal');
+                    const descLines = doc.splitTextToSize(action.description, pageWidth - margin * 2 - 6);
+                    doc.text(descLines, margin + 6, y);
+                    y += (descLines.length * 4) + 2;
+                    
+                    const benefitLines = doc.splitTextToSize(action.benefit, pageWidth - margin * 2 - 6);
+                    doc.text(benefitLines, margin + 6, y);
+                    y += (benefitLines.length * 4) + 2;
+                    
+                    doc.setFont(undefined, 'bold');
+                    doc.setTextColor(32, 170, 63);
+                    doc.text(`Annual Recovery: $${action.value.toLocaleString()}`, margin + 6, y);
+                    doc.setTextColor(50, 50, 50);
+                    y += 8;
+                });
+                y += 5;
+            }
+            
+            // Financial Summary
+            if (y > 200) {
+                doc.addPage();
+                y = 20;
+            }
+            
+            doc.setFontSize(14);
+            doc.setTextColor(37, 75, 135);
+            doc.setFont(undefined, 'bold');
+            doc.text('Financial Summary', margin, y);
+            
+            y += 10;
+            doc.setFontSize(10);
+            doc.setTextColor(50, 50, 50);
+            doc.setFont(undefined, 'normal');
+            
+            doc.text('Total Annual Recovery:', margin, y);
+            doc.setFont(undefined, 'bold');
+            doc.text(`$${totalRecovery.toLocaleString()}`, pageWidth - margin - 40, y);
+            
+            y += 7;
+            doc.setFont(undefined, 'normal');
+            doc.text('Membership Investment:', margin, y);
+            doc.text(`$${membershipCost.toLocaleString()}/year`, pageWidth - margin - 40, y);
+            
+            y += 7;
+            doc.setTextColor(32, 170, 63);
+            doc.text('Tax Deduction (30% bracket):', margin, y);
+            doc.text(`-$${taxSavings.toLocaleString()}`, pageWidth - margin - 40, y);
+            
+            y += 7;
+            doc.setTextColor(50, 50, 50);
+            doc.text('After-Tax Cost:', margin, y);
+            doc.text(`$${afterTaxCost.toLocaleString()}/year`, pageWidth - margin - 40, y);
+            
+            y += 10;
+            doc.setDrawColor(200, 200, 200);
+            doc.line(margin, y, pageWidth - margin, y);
+            
+            y += 7;
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('Net Annual Gain:', margin, y);
+            doc.setTextColor(32, 170, 63);
+            doc.setFontSize(14);
+            doc.text(`$${netGain.toLocaleString()}`, pageWidth - margin - 40, y);
+            
+            // Download PDF for user
+            const fileName = `CFIB-Recovery-Plan-${data.businessName ? data.businessName.replace(/[^a-z0-9]/gi, '_') : 'Business'}.pdf`;
+            doc.save(fileName);
+        }
+    </script>
+</body>
+</html>
